@@ -1,4 +1,4 @@
-# Online Shop
+# E-Commerce Online Shop
 
 📄 License
 
