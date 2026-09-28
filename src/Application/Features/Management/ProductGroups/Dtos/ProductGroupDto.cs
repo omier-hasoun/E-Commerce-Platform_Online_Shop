@@ -14,12 +14,12 @@ public sealed record ProductGroupDto
     public float AverageRating { get; init; }
     public ProductCategoryDto Category { get; init; } = null!;
     public ProductBrandDto Brand { get; init; }
-    public IReadOnlyDictionary<string, string> Attributes { get; init; } = null!;
+    public IReadOnlyDictionary<string, string> Specifications { get; init; } = null!;
     public IReadOnlyCollection<ProductListItemDto> Products { get; init; } = null!;
     public AuditedUserDto LastModifiedInfo { get; init; } = null!;
 
 
-    public ProductGroupDto(ProductGroupId id, string title, string description, IReadOnlyDictionary<string, string> attributes,
+    public ProductGroupDto(ProductGroupId id, string title, string description, IReadOnlyDictionary<string, string> Specifications,
         BrandId brandId, string brandName, CategoryId categoryId, string categoryName, ProductAverageRating averageRating,
         DateTime lastModifiedAt, Guid lastModifiedBy, string lastModifiedByUserName,
         IReadOnlyCollection<ProductListItemDto> products)
@@ -27,7 +27,7 @@ public sealed record ProductGroupDto
         Id = id.ToString();
         Title = title;
         Description = description;
-        Attributes = attributes;
+        Specifications = Specifications;
         Brand = new(brandId, brandName);
         Category = new ProductCategoryDto(categoryId, categoryName);
 

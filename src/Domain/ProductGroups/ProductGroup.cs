@@ -8,7 +8,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
     {
     }
     private ProductGroup(ProductGroupId id, BrandId brandId, string brandName, CategoryId categoryId, string categoryName, string title, string normalizedTitle, string description, ProductAverageRating averageRating, ProductGroupState status,
-       bool isSerialized, Dictionary<string, string> attributes, DateTime createdAt, DateTime lastModifiedAt, Guid createdBy, Guid lastModifiedBy)
+       bool isSerialized, Dictionary<string, string> specifications, DateTime createdAt, DateTime lastModifiedAt, Guid createdBy, Guid lastModifiedBy)
         : base(id)
     {
         BrandId = brandId;
@@ -19,7 +19,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         NormalizedTitle = normalizedTitle;
         Description = description;
         IsSerialized = isSerialized;
-        Attributes = attributes;
+        Specifications = specifications;
         AverageRating = averageRating;
         Status = status;
         CreatedAt = createdAt;
@@ -28,7 +28,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         LastModifiedBy = lastModifiedBy;
     }
     public static Result<ProductGroup> Create(ProductGroupId id, BrandId brandId, string brandName, CategoryId categoryId, string categoryName, string title, string description,
-        bool isSerialized, Dictionary<string, string> attributes)
+        bool isSerialized, Dictionary<string, string> specifications)
     {
         // Add domain validation logic here
         var validationResult = Result.ValidateAll(
@@ -46,13 +46,13 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         var lastModifiedBy = Guid.Empty;
         var createdBy = lastModifiedBy;
 
-        attributes ??= [];
+        specifications ??= [];
         title = title.Trim();
 
         var normalizedTitle = RegexHelper.Normalize(title);
 
         var productGroup = new ProductGroup(id, brandId, brandName, categoryId, categoryName, title, normalizedTitle, description, averageRating,
-            status, isSerialized, attributes, createdAt, lastModifiedAt, createdBy, lastModifiedBy);
+            status, isSerialized, specifications, createdAt, lastModifiedAt, createdBy, lastModifiedBy);
 
         return productGroup;
     }
@@ -78,8 +78,8 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
     public DateTime LastModifiedAt { get; set; }
 
 
-    Dictionary<string, string> _attributes = [];
-    public IReadOnlyDictionary<string, string> Attributes { get { return _attributes.AsReadOnly(); } private set { _attributes = value is null ? [] : value.ToDictionary(); } }
+    Dictionary<string, string> _specifications = [];
+    public IReadOnlyDictionary<string, string> Specifications { get { return _specifications.AsReadOnly(); } private set { _specifications = value is null ? [] : value.ToDictionary(); } }
 
     private List<Product> _products = [];
     public IReadOnlyCollection<Product> Products { get { return _products.AsReadOnly(); } private set { _products = value is null ? [] : value.ToList(); } }
@@ -108,7 +108,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
 
 
     public Result<Updated> Update(BrandId? brandId, string? brandName, CategoryId? categoryId, string? categoryName, string? title, string? description,
-        bool? isSerialized, Dictionary<string, string>? attributes)
+        bool? isSerialized, Dictionary<string, string>? specifications)
     {
         if (!CanModify())
             return DomainErrors.Locked;
@@ -168,9 +168,9 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
 
         }
 
-        if (attributes != null)
+        if (specifications != null)
         {
-            var res = ValidateAttributes(attributes);
+            var res = ValidateSpecifications(specifications);
 
             if (res.Failed)
                 errors.Add(res.TopError);
@@ -179,7 +179,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         if (errors.Count > 0)
             return errors;
 
-        _attributes = attributes ?? _attributes;
+        _specifications = specifications ?? _specifications;
 
         IsSerialized = isSerialized ?? IsSerialized;
 
@@ -430,11 +430,11 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         return Result.Success;
     }
 
-    internal static Result<Success> ValidateAttributes(Dictionary<string, string> attributes)
+    internal static Result<Success> ValidateSpecifications(Dictionary<string, string> specifications)
     {
-        if (attributes is null || attributes.Count == 0)
+        if (specifications is null || specifications.Count == 0)
         {
-            return DomainErrors.Products.AttributesInvalid;
+            return DomainErrors.Products.SpecificationsInvalid;
         }
 
         return Result.Success;

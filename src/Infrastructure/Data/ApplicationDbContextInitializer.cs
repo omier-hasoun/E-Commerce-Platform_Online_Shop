@@ -34,53 +34,19 @@ public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitial
 
     private async Task SeedData()
     {
-        await roleManager.CreateAsync(new Role()
-        {
-            Id = Guid.Parse("45995BD9-F233-4EB3-BDFA-41B012113B85"),
-            Name = "Admin",
-        });
-        await roleManager.CreateAsync(new Role()
-        {
-            Id = Guid.Parse("45995BD9-F233-4EB3-BDFA-41B012113B11"),
-            Name = "Staff",
-
-        });
-        await roleManager.CreateAsync(new Role()
-        {
-            Id = Guid.Parse("45995BD9-F233-4EB3-BDFA-41B012113B91"),
-            Name = "Manager",
-
-        });
-        var user1 = new AppUser()
-        {
-            Id = Guid.Parse("10000000-0000-0000-0000-000000000001"),
-            Email = "om@gmail.com",
-            NormalizedEmail = "om@gmail.com".ToUpper(),
-            UserName = "om@gmail.com",
-            NormalizedUserName = "om@gmail.com".ToUpper(),
-            EmailConfirmed = true,
-            AccessFailedCount = 0,
-            PhoneNumber = "092737287",
-
-        };
-        var result = await userManager.CreateAsync(user1, "1234Omier#");
-
-
-        await SeedCurrencies();
         var random = new Random();
-
         var brandId1 = new BrandId(Guid.Parse("019dd6b8-96d0-734b-97ca-02b8094e7f00"));
         var brandName1 = "Apple";
         var brandId2 = new BrandId(Guid.Parse("019dd6b8-96d0-7904-8a7a-d1e750789a04"));
         var brandName2 = "Nvidia";
 
-        context.Brands.Add(Brand.Create(brandId1, brandName1, "shity company", "Apple GmbH", "APP", null).Value);
-        context.Brands.Add(Brand.Create(brandId2, brandName2, "shity company", "NVidia GmbH", "NVIDIA", null).Value);
+        // context.Brands.Add(Brand.Create(brandId1, brandName1, "shity company", "Apple GmbH", "APP", null).Value);
+        // context.Brands.Add(Brand.Create(brandId2, brandName2, "shity company", "NVidia GmbH", "NVIDIA", null).Value);
 
         var categoryId1 = new CategoryId(1);
         var categoryName1 = "Smart phones";
         var categoryId2 = new CategoryId(2);
-        var categoryName2 = "Books";
+        var categoryName2 = "Graphic cards";
 
         context.Categories.Add(Category.Create(categoryId1, categoryName1, null).Value);
         context.Categories.Add(Category.Create(categoryId2, categoryName2, null).Value);
@@ -155,6 +121,41 @@ public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitial
                 await context.SaveAsync();
             }
         }
+           await SeedCurrencies();
+
+        await roleManager.CreateAsync(new Role()
+        {
+            Id = Guid.Parse("45995BD9-F233-4EB3-BDFA-41B012113B85"),
+            Name = "Admin",
+        });
+        await roleManager.CreateAsync(new Role()
+        {
+            Id = Guid.Parse("45995BD9-F233-4EB3-BDFA-41B012113B11"),
+            Name = "Staff",
+
+        });
+        await roleManager.CreateAsync(new Role()
+        {
+            Id = Guid.Parse("45995BD9-F233-4EB3-BDFA-41B012113B91"),
+            Name = "Manager",
+
+        });
+        var user1 = new AppUser()
+        {
+            Id = Guid.Parse("10000000-0000-0000-0000-000000000001"),
+            Email = "om@gmail.com",
+            NormalizedEmail = "om@gmail.com".ToUpper(),
+            UserName = "om@gmail.com",
+            NormalizedUserName = "om@gmail.com".ToUpper(),
+            EmailConfirmed = true,
+            AccessFailedCount = 0,
+            PhoneNumber = "092737287",
+
+        };
+        var result = await userManager.CreateAsync(user1, "1234Omier#");
+
+
+
 
         var addressId = new AddressId(201);
         var address = Address.Create(addressId, "Omier Hason", "01789 386 4983", "DE", "41", "Essen", "45355", "Marktstr. 41", null, null, null, "best appartment").Value;

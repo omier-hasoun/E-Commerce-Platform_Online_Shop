@@ -72,11 +72,13 @@ internal sealed class ProductGroupsConfig : BaseEntityConfig<ProductGroup>
         builder.HasOne<Brand>()
                .WithMany()
                .HasForeignKey(x => x.BrandId)
+               .OnDelete(DeleteBehavior.Restrict)
                .IsRequired();
 
         builder.HasOne<Category>()
                .WithMany()
                .HasForeignKey(x => x.CategoryId)
+               .OnDelete(DeleteBehavior.Restrict)
                .IsRequired();
 
         builder.HasOne(x => x.MainProduct)

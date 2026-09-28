@@ -1,0 +1,23 @@
+
+/* when a product has no discount*/
+.price {
+    color:black;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.original-price {
+    color: gray;
+    font-size: 1rem;
+}
+
+.discount-price {
+    color: #d32f2f;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.discount-percentage {
+    font-size: 1rem;
+    font-weight: bold;
+}

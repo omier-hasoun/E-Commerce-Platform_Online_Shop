@@ -1,0 +1,24 @@
+
+.app-paginator {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap:10px;
+    font-size:inherit;
+    justify-content: center;
+}
+
+.app-paginator-current-page {
+    height: 50px;
+    width: 50px;
+    font-size: inherit;
+    text-align: center;
+}
+
+.app-paginator-btn {
+    width: 100%;
+    max-width: 100px;
+    max-height:40px;
+
+    font-size:100%;
+}

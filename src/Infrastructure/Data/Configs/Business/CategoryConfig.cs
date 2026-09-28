@@ -24,7 +24,12 @@ internal sealed class CategoryConfig : BaseEntityConfig<Category>
 
         builder.HasOne<Category>()
                .WithMany()
-               .HasForeignKey(x => x.ParentCategoryId);
+               .HasForeignKey(x => x.ParentCategoryId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => x.Name)
+               .IsUnique()
+               .HasDatabaseName("IX_Categories_Name");
 
         builder.ToTable("Categories");
 

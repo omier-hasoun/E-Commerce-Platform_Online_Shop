@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in or register</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/shared.css">
+    <link rel="stylesheet" href="/css/authentication-flow.css">
+    <script type="module" src="/js/app.js"></script>
+</head>
+<body data-page="login">
+
+    <app-header></app-header>
+
+    <main id="content">
+    <input class="tab-input" type="radio" name="tab" id="tab-login" checked>
+    <input class="tab-input" type="radio" name="tab" id="tab-register">
+    <div class="card">
+
+        <div class="tabs">
+            <label for="tab-login">Log in</label>
+            <label for="tab-register">Register</label>
+        </div>
+
+    <!-- Login -->
+    <section class="panel panel-login">
+      <h1>Welcome back</h1>
+      <p class="sub">Log in to your account.</p>
+      <p class="msg err" id="loginError" role="alert" hidden>Incorrect email or password.</p>
+
+      <form id="loginForm" method="post" action="#">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+        </div>
+        <div class="row">
+          <a href="/forgot-password">Forgot password?</a>
+        </div>
+        <button class="btn" type="submit">Log in</button>
+      </form>
+    </section>
+
+    <!-- Register -->
+    <section class="panel panel-register">
+      <h1>Create your account</h1>
+      <p class="sub">It only takes a minute.</p>
+
+      <form id="registerForm" method="post" action="#">
+        <div class="field">
+          <p id="emailError" class="msg err" role="alert" hidden>Email already used, please enter another email</p>
+          <label for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" name="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+            <p id="requiresLowerError" class="msg err" role="alert" hidden>Requires lower case character (a-z)</p>
+            <p id="requiresUpperError" class="msg err" role="alert" hidden>Requires upper case character (A-Z)</p>
+            <p id="requiresNonAlphanumericError" class="msg err" role="alert" hidden>Requires a non alphanumeric character e.g. (# & % etc.)</p>
+            <p id="requiresDigitError" class="msg err" role="alert" hidden>Requires at least 1 digit (0-9)</p>
+            <p id="passwordTooShortError" class="msg err" role="alert" hidden>Requires at least 6 characters</p>
+
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" name="password" autocomplete="new-password" minlength="6" required>
+            <p class="hint" >At least 6 characters.</p>
+        </div>
+        <button class="btn" type="submit">Create account</button>
+      </form>
+    </section>
+    </div>
+
+    </main>
+<app-footer></app-footer>
+</body>
+</html>

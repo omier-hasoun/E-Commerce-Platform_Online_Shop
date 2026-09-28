@@ -9,21 +9,144 @@ export class Router {
 
     }
 
-  /**
-   * @param {URL | String}  url
-   */
-   async navigate(url, forceReload = false) {
+/**
+ * @param {URL | string} url
+ */
+    replaceState(url){
+        const href = url instanceof URL ? url : new URL(url, window.location.origin);
+        href.search = href.search === "?null" ? "" : href.search;
 
-    if (forceReload) {
-      window.location.href = url;
-      return;
+        history.replaceState(null, "", href);
     }
 
-    const href = url instanceof URL ? url.href : url;
+   async load(page, forceFullReload = false) {
 
-    await this.#loader.load(href);
-    history.pushState(null, '', href);
+    await this.#loader.load(`/${page}.html`, forceFullReload);
+    const pageModule = await import(`/js/pages/${page}.js`);
 
-    document.dispatchEvent(new CustomEvent("pageLoaded"));
+    await pageModule.init();
   }
+
+/**
+ * @param {URL | string} url
+ */
+  pushState(url){
+
+    const href = url instanceof URL ? url : new URL(url, window.location.origin);
+
+    href.search = href.search === "?null" ? "" : href.search;
+    history.pushState(null, '', href);
+  }
+
+  async loadCurrentPage(){
+
+    const path = window.location.pathname;
+
+    const searchParams =  new URLSearchParams(window.location.search);
+
+    if (path === '/'){
+        await this.navigateToHome(searchParams, false);
+    }
+
+    else if (path === "/products")
+    {
+        await this.navigateToProducts(searchParams, false);
+    }
+
+    else if (path.match(/^\/products\/(\d+)$/))
+    {
+        // productId
+        const match = path.match(/^\/products\/(\d+)$/);
+        await this.navigateToProductView(match[1], searchParams, false);
+    }
+
+    else if (path === "/products/create")
+    {
+        await this.navigateToProductEditor("create", null, searchParams, false);
+    }
+
+    else if (path.match(/^\/products\/edit\/(\d+)$/))
+    {
+        const match = path.match(/^\/products\/edit\/(\d+)$/);
+
+        await this.navigateToProductEditor("update", match[2], searchParams, false);
+    }
+
+    else if (path === "/login")
+    {
+        await this.navigateToLogin(searchParams, false)
+    }
+
+    window.scrollTo(0,0);
+
+  }
+
+    #handleUrlState(path, searchParams = null, pushstate = true)
+    {
+        const url = new URL(path, window.location.origin);
+
+        if(searchParams)
+            url.search = searchParams;
+
+        if(pushstate)
+        {
+            this.pushState(url);
+        }
+        else
+        {
+            this.replaceState(url);
+        }
+    }
+
+    async navigateToProducts(searchParams = null, pushstate = true){
+
+        this.#handleUrlState('/products', searchParams, pushstate)
+
+        await this.load('products', false);
+    }
+
+    async navigateToHome(searchParams = null, pushstate = true){
+
+        this.#handleUrlState('/', searchParams, pushstate)
+
+        await this.load('home', true);
+    }
+
+    async navigateToProductView(productId, searchParams = null, pushstate = true){
+
+        this.#handleUrlState(`/products/${productId}`, searchParams, pushstate)
+
+        await this.load('product-view', false);
+    }
+
+    async navigateToProductEditor(mode, id=null, searchParams = null, pushstate = true){
+
+        let path;
+        if(mode === "update" && id !== null)
+        {
+            path = `/products/edit/${id}`;
+        }
+        else if (mode === "create")
+        {
+            path = `/products/create`;
+        }
+        else
+        {
+            throw new Error("no mode was provided to view product editor page");
+        }
+        this.#handleUrlState(path, searchParams, pushstate);
+
+        await this.load('product-editor', true);
+    }
+
+    async navigateToLogin(searchParams = null, pushstate = true){
+
+        this.#handleUrlState('/login', searchParams, pushstate);
+        await this.load('login', true);
+    }
+
+    replaceUrl(url){
+
+        window.location.href = url;
+    }
 }

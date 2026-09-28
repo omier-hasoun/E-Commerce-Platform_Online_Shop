@@ -21,13 +21,14 @@ public static class DependencyInjection
     private static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        
+
         services.AddExceptionHandler<GlobalExceptionHandler>();
 
         services.AddControllers()
                    .AddJsonOptions(options =>
         {
            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+           options.JsonSerializerOptions.Converters.Add(new NullableLongAsStringJsonConverter());
            options.JsonSerializerOptions.Converters.Add(new LongAsStringJsonConverter());
            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });

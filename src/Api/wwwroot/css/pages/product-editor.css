@@ -1,0 +1,12 @@
+legend{
+
+}
+
+form {
+
+}
+
+.data-input{
+    display: flex;
+    flex-direction: row;
+}

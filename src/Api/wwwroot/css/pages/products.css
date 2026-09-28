@@ -1,0 +1,107 @@
+@import "../components/product-card.css";
+@import "../components/app-paginator.css";
+@import "../components/product-price.css";
+@import "../components/app-dialog.css";
+
+
+#productsContainer {
+    width:100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 5pt;
+    gap: 1ex;
+    grid-column: 1/2;
+    grid-row:2/3;
+    justify-content: start;
+    align-items: center;
+
+}
+
+.page {
+    width:100%;
+    height: 100%;
+    display:grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 5vh auto 1fr;
+}
+
+.paginator {
+    width:100%;
+    height: 100%;
+    grid-column: 1/2;
+    grid-row:3/4;
+    font-size:1.4rem;
+    place-self:center;
+}
+
+.filter-options{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.filter-option{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.apply-filters{
+    align-self: end;
+}
+
+.filters-btn{
+    grid-column: 1/2;
+    grid-row:1/2;
+    width: 80px;
+    height: 30px;
+    place-self:center;
+
+}
+
+.brand-selector,
+.category-selector,
+#maxPriceInput{
+    width: 150px;
+    height: 25px;
+}
+
+.product-card-aspect {
+    max-width: 800px;
+    width:100%;
+    height:200px;
+}
+
+.applyFiltersBtn{
+    width:80px;
+    height:30px;
+}
+
+app-dialog{
+    width:40vw;
+    height:100vh;
+}
+
+/* .search-filters {
+    flex-direction: column;
+    background-color: whitesmoke;
+
+    max-width: 400px;
+    height: 100vh;
+    margin: 0 auto 0 0;  /* top right bottom left
+    gap: 2ex;
+}
+*/
+
+
+@media (max-width: 668px) {
+    .product-card-aspect{
+        height:180px;
+    }
+
+    app-dialog{
+        width:80vw;
+    }
+}

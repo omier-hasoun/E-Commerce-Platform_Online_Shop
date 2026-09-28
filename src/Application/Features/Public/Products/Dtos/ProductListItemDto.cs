@@ -6,7 +6,6 @@ namespace Application.Features.Public.Products.Dtos;
 
 public sealed record ProductListItemDto
 {
-    public long GroupId { get; init; }
     public long Id { get; }
     public string Title { get; init; } = null!;
     public double OriginalPrice { get; init; }
@@ -18,11 +17,10 @@ public sealed record ProductListItemDto
     public bool HasDiscount { get; init; }
     public bool InStock { get; }
 
-    public ProductListItemDto(ProductId id, ProductGroupId groupId, string title, Money originalPrice, string brand, ProductAverageRating averageRating,
+    public ProductListItemDto(ProductId id, string title, Money originalPrice, string brand, ProductAverageRating averageRating,
         string? thumbnailUrl, bool hasDiscount, Money? discountPrice, byte? discountPercentage, bool inStock)
     {
         Id = id.Value;
-        GroupId = groupId.Value;
         Title = title;
         Brand = brand;
         HasDiscount = hasDiscount;

@@ -31,7 +31,7 @@ internal sealed class GetProductByIdQueryHandler(IAppDbContext context) : IReque
                 product.Slug,
                 product.BarCode,
                 product.HasDiscount,
-                product.Specifications.ToDictionary(),
+                product.VariantSpecifications.ToDictionary(),
                 [.. product.Images],
                 new ProductInventoryDto(product.Inventory.WarehouseId,
                                         product.Inventory.Warehouse.Name,

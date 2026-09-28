@@ -50,7 +50,7 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
             request.Title,
             request.Description,
             request.IsSerialized,
-            request.Attributes);
+            request.Specifications);
 
         var result = await mediator.Send(command, ct);
 
@@ -62,7 +62,7 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
     public async Task<IActionResult> AddProduct(long id, [FromForm] AddProductRequest request, CancellationToken ct)
     {
         List<FileUploadDto>? imagesDto = null;
-        if(request.Images != null && request.Images.Count > 0)
+        if (request.Images != null && request.Images.Count > 0)
         {
             imagesDto = new(request.Images.Count);
             request.Images.ForEach(image => imagesDto.Add(
@@ -96,12 +96,12 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
 
         var result = await mediator.Send(command, ct);
 
-        return result.Match( (response) =>
-        
+        return result.Match((response) =>
+
         Created(
             Url.Action(nameof(GetProductById), "ProductsManagement", new { Id = response }),
             new { Id = response }),
-                    
+
             Problem
         );
     }
@@ -134,7 +134,7 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
     }
 
     [HttpPost("product-group/{productGroupId}/products/{productId}/apply-discount")]
-    public async Task<IActionResult> ApplyDiscount(long productGroupId, long productId, [FromBody] ApplyDiscountRequest request , CancellationToken ct)
+    public async Task<IActionResult> ApplyDiscount(long productGroupId, long productId, [FromBody] ApplyDiscountRequest request, CancellationToken ct)
     {
 
         var result = await mediator.Send(new ApplyDiscountCommand(productGroupId, productId, request.DiscountExpiresOn, request.DiscountPercentage), ct);
@@ -159,7 +159,7 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
     }
 
     [HttpPost("products/{productId}/inventory/{warehouseId}")]
-    public async Task<IActionResult> RestockProduct(long warehouseId, long productId, [FromBody]int stockQuantity, CancellationToken ct)
+    public async Task<IActionResult> RestockProduct(long warehouseId, long productId, [FromBody] int stockQuantity, CancellationToken ct)
     {
         var result = await mediator.Send(new RestockProductCommand(warehouseId, productId, stockQuantity), ct);
 

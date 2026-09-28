@@ -256,7 +256,7 @@ namespace Infrastructure.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("NVARCHAR");
 
-                    b.Property<string>("SkuName")
+                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("VARCHAR");
@@ -264,6 +264,18 @@ namespace Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
+
+                    b.HasIndex("CompanyName")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Brands_CompanyName");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Brands_Name");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Brands_Slug");
 
                     b.ToTable("Brands", (string)null);
                 });
@@ -346,6 +358,10 @@ namespace Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Categories_Name");
 
                     b.HasIndex("ParentCategoryId");
 
@@ -699,7 +715,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(300)
+                        .HasMaxLength(1000)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<bool>("IsSerialized")
@@ -1173,7 +1189,8 @@ namespace Infrastructure.Data.Migrations
                 {
                     b.HasOne("Domain.Categories.Category", null)
                         .WithMany()
-                        .HasForeignKey("ParentCategoryId");
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Domain.Common.Entities.Addresses.Address", b =>
@@ -1395,13 +1412,13 @@ namespace Infrastructure.Data.Migrations
                     b.HasOne("Domain.Brands.Brand", null)
                         .WithMany()
                         .HasForeignKey("BrandId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Categories.Category", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Application.Entities.AppUser", null)

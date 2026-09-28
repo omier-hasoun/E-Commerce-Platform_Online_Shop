@@ -115,7 +115,7 @@ public sealed class AppDbContext : IdentityDbContext<AppUser, Role, Guid, UserCl
         foreach (var entityType in types)
         {
 
-            if(typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
+            if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
             {
                 var method = typeof(AppDbContext).GetMethod(nameof(ApplySoftDeleteQueryFilter), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!
                                                  .MakeGenericMethod(entityType.ClrType);

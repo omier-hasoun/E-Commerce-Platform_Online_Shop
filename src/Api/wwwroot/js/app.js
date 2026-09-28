@@ -1,57 +1,33 @@
 ﻿
-import '/js/components/app-header.js';
 import '/js/components/app-footer.js';
+import '/js/components/app-header.js';
+import '/js/components/brand-selector.js';
+import '/js/components/category-selector.js';
+
 import { Router } from './core/router.js';
-import { PageLoader } from './core/page-loader.js';
 
-const searchFormInput = document.getElementById("searchFormInput");
-const submitQueryBtn = document.getElementById("searchFormSubmit");
-// const content = document.getElementById("content");
 const router = new Router();
-const pageLoader = new PageLoader();
-
 const size = 25;
+const page = 1;
 
-searchFormInput.addEventListener("input", () => {
-    const hasText = searchFormInput.value.trim().length >= 1;
-    submitQueryBtn.disabled = !hasText;
-});
+document.addEventListener("querysubmit", async (event) => {
 
-
-submitQueryBtn.addEventListener("click", async (event) => {
-    event.preventDefault();
-
-    const page = 1;
     const filters = {
-        q: searchFormInput.value.trim(),
+        q: event.detail.text?.trim(),
         size: size,
         page: page,
     }
 
-    const url = new URL('/products.html', window.location.origin);
-    url.search = new URLSearchParams(filters);
-
-    await router.navigate(url);
-
+    await router.navigateToProducts(new URLSearchParams(filters));
 });
 
 async function initializePage() {
 
-    changeSearchInputFromUrl();
-    await pageLoader.load(window.location.href);
-    const currentPage = document.body.getAttribute("data-page");
-
-    const pageModule = await import(`/js/pages/${currentPage}.js`);
-
-    await pageModule.init();
+    const text = new URLSearchParams(location.search).get('q');
+    document.querySelector("app-header").setSearchInput(text);
+    await router.loadCurrentPage();
 }
 
-function changeSearchInputFromUrl()
-{
-    searchFormInput.value = new URLSearchParams(location.search).get('q');
-}
+window.addEventListener("DOMContentLoaded", async () => await initializePage());
 
-document.addEventListener("DOMContentLoaded", initializePage);
-
-window.addEventListener("popstate", initializePage);
-document.addEventListener("pageLoaded", initializePage);
+window.addEventListener("popstate", async () => await initializePage());

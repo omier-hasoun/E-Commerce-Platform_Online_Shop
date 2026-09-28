@@ -1,10 +1,12 @@
 
+using Application.Features.Public.Categories.Dtos;
 using Domain.Brands;
 using Domain.Carts;
 using Domain.Carts.CartItems;
 using Domain.Categories;
 using Domain.Common.ValueObjects;
 using Domain.ProductGroups.Products;
+using Domain.ProductGroups.ValueObjects;
 using Shared.Helpers;
 
 namespace Application.Common.Extensions;
@@ -84,9 +86,34 @@ internal static class QueryableExtensions
 
         return query.Where(x => statuses.Contains(x.Status));
     }
+    public static IQueryable<ProductGroup> ApplyDiscountedProductsFilter(this IQueryable<ProductGroup> query, bool discountedProductsOnly)
+    {
+        if(!discountedProductsOnly)
+            return query;
+
+        return query.Where(x => x.Products.Any(p => p.HasDiscount));
+    }
+    public static IQueryable<ProductGroup> ApplyMaxPriceFilter(this IQueryable<ProductGroup> query, int? maxPrice)
+    {
+        if(maxPrice.HasValue && maxPrice > 0)
+        {
+            var parsedMaxPrice =  Money.Create(maxPrice.Value);
+            return query.Where(g => g.MainProduct!.CurrentPrice <= parsedMaxPrice);
+        }
+        return query;
+    }
+    public static IQueryable<ProductGroup> ApplyRatingFilter(this IQueryable<ProductGroup> query, bool onlyGoodRated)
+    {
+        if(!onlyGoodRated)
+            return query;
+
+        var goodRating =  ProductAverageRating.From(3).Value;
+        return query.Where(x => x.AverageRating > goodRating);
+    }
+
     public static IQueryable<ProductGroup> GetPubishedProductGroups(this IQueryable<ProductGroup> query)
     {
-        return query.Where(x => x.Status == ProductGroupState.Published);
+        return query.Where(x => x.Status == ProductGroupState.Published && x.MainProductId != null);
     }
 
     #endregion
@@ -149,4 +176,18 @@ internal static class QueryableExtensions
 
         return list.ToPaginatedList(page, hasMore);
     }
+
+    public static async Task<Result<List<CategoryListItem>>> ListCategoriesAsync(this IQueryable<Category> query, DbSet<Category> db, CancellationToken ct)
+    {
+        var q = query.AsNoTracking()
+                                .Where(x => x.ParentCategoryId == null)
+                                .Select(x =>
+                                new CategoryListItem(x.Id.ToString(), x.Name)
+                                );
+
+        var categories = await q.ToListAsync(ct);
+
+        return categories;
+    }
+
 }

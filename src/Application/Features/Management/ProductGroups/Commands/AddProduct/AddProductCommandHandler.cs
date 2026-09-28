@@ -1,4 +1,4 @@
-using Application.Common.Dtos;
+
 using Application.Features.Management.ProductGroups.Dtos;
 using Domain.Common.ValueObjects;
 using Domain.Inventories;
@@ -32,7 +32,7 @@ public sealed class AddProductCommandHandler(IAppDbContext context, IIdGenerator
         {
             return addProductResult.Errors;
         }
-        
+
         if (request.Images != null && request.Images.Count != 0)
         {
             await AddImages(productGroup, productId, request.Images, ct);

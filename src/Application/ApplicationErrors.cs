@@ -3,7 +3,7 @@ namespace Application;
 
 // for copy paste
 
-/* 
+/*
  public static readonly Error rename1 = Error.Validation($"{BaseErrorCode}.{nameof(rename1)}");
 
  public static readonly Error rename2 = Error.Validation($"{BaseErrorCode}.{nameof(rename2)}");
@@ -44,8 +44,6 @@ public static class ApplicationErrors
     public static readonly Error OperationWasCanceled = Error.Validation($"{nameof(ApplicationErrors)}.{nameof(OperationWasCanceled)}");
 
     public static readonly Error DeleteOperationFailed = Error.Validation($"{nameof(ApplicationErrors)}.{nameof(DeleteOperationFailed)}");
-
-    public static readonly Error rename3 = Error.Validation($"{nameof(ApplicationErrors)}.{nameof(rename3)}");
 
     public static readonly Error rename4 = Error.Validation($"{nameof(ApplicationErrors)}.{nameof(rename4)}");
     public static class Validation

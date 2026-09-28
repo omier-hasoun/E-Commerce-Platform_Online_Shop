@@ -1,12 +1,21 @@
 class ProductCard extends HTMLElement
 {
-  // Runs automatically as soon as <product-card> is inserted into the page
+    /** @type {HTMLElement} */
+    #productCardElm;
+    #productId = "";
+    #productPriceElm;
+
+    #startX;
+    #startY;
+    #moved;
+    CLICK_THRESHOLD = 25;
   connectedCallback()
   {
-    // Read custom attributes passed to the HTML tag
     const id = this.getAttribute('id');
     if (!id)
         throw new Error("product id missing");
+
+    this.#productId = id;
 
     const title = this.getAttribute('title') || 'Default Item';
     const loading = this.getAttribute('loading') || 'lazy';
@@ -16,66 +25,93 @@ class ProductCard extends HTMLElement
     const textColor = inStock ? "green" : "red";
     const isAvailableText = inStock ? "In Stock" : "Unavailable";
 
-
-    // Build the inner HTML for this custom element
-    this.innerHTML = `
- <article class="product-card">
+        this.innerHTML = `
+ <article class="product-card" data-element="product"->
         <figure>
             <img src="${image}" alt="${title}" loading="${loading}">
         </figure>
-        <div class="product-info">
-            <p class="brand">${brand}</p>
-            <h3><a class="product-title default-font" href="/products/${id}">${title}</a></h3>
-            <div class="bottom-row">
-                <div class="bottom-row-left">
-                    ${this.createRating()}
-                    <p class="product-availability" style="color:${textColor}">${isAvailableText}</p>
-                </div>
-                ${this.createPrice()}
-            </div>
+        <div class="card-info">
+            <p class="card-brand">${brand}</p>
+            <h3 class="card-title">${title}</h3>
+            ${this.createRating()}
+            <p class="card-stock-info" style="color:${textColor}">${isAvailableText}</p>
+            <product-price data-element="product-price" class="card-price"></product-price>
         </div>
     </article>
     `;
 
-  }
-createRating() {
-    const rating = this.getAttribute('rating') || '0';
-
-    return `
-        <span class="rating">${rating}⭐</span>
-    `;
-}
-
-createPrice() {
-
+    this.#productCardElm = this.querySelector('[data-element="product"]');
+    this.#productPriceElm = this.querySelector('[data-element="product-price"]');
     const hasDiscount = this.getAttribute('hasDiscount') === 'true';
     const originalPrice = this.getAttribute('originalPrice');
 
-    if (!hasDiscount)
-    {
-
-        if(!originalPrice)
-            throw new Error("product does not have a price");
-
-        return `
-        <div class="price-section default-font">
-            <p class="price">$${originalPrice}</p>
-        </div>
-        `;
-    }
-
     const discountPrice = this.getAttribute('discountPrice');
     const discountPercentage = this.getAttribute('discountPercentage');
+    this.#productPriceElm.setAttribute('originalprice', originalPrice);
+    this.#productPriceElm.setAttribute('hasdiscount', hasDiscount);
+    this.#productPriceElm.setAttribute('discountprice', discountPrice);
+    this.#productPriceElm.setAttribute('discountpercentage', discountPercentage);
+    this.#productPriceElm.render();
 
-    return `
-    <div class="price-section default-font">
-        <span class="discount-percentage">${discountPercentage} % OFF</span>
-        <del class="original-price">$${originalPrice}</del>
-        <ins class="discount-price">$${discountPrice}</ins>
-    </div>
-    `;
-}
+    this.#productCardElm.addEventListener('pointerdown',(e) => {
+        this.#startX = e.clientX;
+        this.#startY = e.clientY;
+        this.#moved = false;
+
+    });
+
+    this.#productCardElm.addEventListener('pointermove',(e) => {
+        if(e.buttons !== 1){
+            return;
+        }
+        const dx = e.clientX - this.#startX;
+        const dy= e.clientY - this.#startY;
+
+        if(Math.hypot(dx, dy) > this.CLICK_THRESHOLD)
+        {
+            this.#moved = true;
+            this.#productCardElm.style.cursor = "text";
+        }
+    });
+    this.#productCardElm.addEventListener('pointerup',(e) => {
+        this.#productCardElm.style.cursor = "pointer";
+
+        if(this.#moved)
+        {
+
+            return;
+        }
+        this.#dispatchPageChange();
+    });
+
+    this.#productCardElm.addEventListener('pointerleave',(e) => {
+            this.#productCardElm.style.cursor = "pointer";
+    });
+
+  }
+
+#dispatchPageChange() {
+    this.dispatchEvent(
+        new CustomEvent("productclick", {
+            bubbles: true,
+            detail: {
+                productId: this.#productId
+            }
+        })
+    );
 }
 
-// Register your tag name with the browser
+#dispatch
+
+createRating() {
+    const rating = this.getAttribute('rating') || '0';
+
+    return  `<span class="card-rating">${rating} ⭐</span>`;
+}
+
+render(){
+    this.connectedCallback();
+}
+
+}
 customElements.define('product-card', ProductCard);

@@ -3,7 +3,7 @@ namespace Domain;
 
 // for copy paste
 
-/* 
+/*
  public static readonly Error rename1 = Error.Validation($"{BaseErrorCode}.{nameof(rename1)}");
 
  public static readonly Error rename2 = Error.Validation($"{BaseErrorCode}.{nameof(rename2)}");
@@ -124,7 +124,7 @@ public static class DomainErrors
 
 
 
-public static class Products
+    public static class Products
     {
         public const string BaseErrorCode = "DomainErrors.Products";
 
@@ -160,7 +160,7 @@ public static class Products
 
         public static readonly Error CannotUpdateIsSerializedAfterPublish = Error.Validation($"{BaseErrorCode}.{nameof(CannotUpdateIsSerializedAfterPublish)}");
 
-        public static readonly Error AttributesInvalid = Error.Validation($"{BaseErrorCode}.{nameof(AttributesInvalid)}");
+        public static readonly Error SpecificationsInvalid = Error.Validation($"{BaseErrorCode}.{nameof(SpecificationsInvalid)}");
 
         public static readonly Error CannotChangeCategoryAfterPublish = Error.Validation($"{BaseErrorCode}.{nameof(CannotChangeCategoryAfterPublish)}");
 
@@ -280,7 +280,11 @@ public static class Products
 
         public static readonly Error BrandIdInvalid = Error.Validation($"{BaseErrorCode}.{nameof(BrandIdInvalid)}");
 
-        public static readonly Error rename2 = Error.Validation($"{BaseErrorCode}.{nameof(rename2)}");
+        public static readonly Error NameInvalid = Error.Validation($"{BaseErrorCode}.{nameof(NameInvalid)}");
+        public static readonly Error DescriptionInvalid = Error.Validation($"{BaseErrorCode}.{nameof(DescriptionInvalid)}");
+        public static readonly Error CompanyNameInvalid = Error.Validation($"{BaseErrorCode}.{nameof(CompanyNameInvalid)}");
+        public static readonly Error SlugInvalid = Error.Validation($"{BaseErrorCode}.{nameof(SlugInvalid)}");
+        public static readonly Error LogoUrlInvalid = Error.Validation($"{BaseErrorCode}.{nameof(LogoUrlInvalid)}");
 
         public static readonly Error rename3 = Error.Validation($"{BaseErrorCode}.{nameof(rename3)}");
 
@@ -307,7 +311,7 @@ public static class Products
 
         public static readonly Error CategoryIdInvalid = Error.Validation($"{BaseErrorCode}.{nameof(CategoryIdInvalid)}");
 
-        public static readonly Error rename1 = Error.Validation($"{BaseErrorCode}.{nameof(rename1)}");
+        public static readonly Error InvalidName = Error.Validation($"{BaseErrorCode}.{nameof(InvalidName)}");
 
         public static readonly Error rename2 = Error.Validation($"{BaseErrorCode}.{nameof(rename2)}");
 
@@ -578,7 +582,7 @@ public static class Products
     public static class Inventories
     {
         public const string BaseErrorCode = "DomainErrors.ProductsStock";
-        
+
         public static readonly Error ProductStockIdInvalid = Error.Validation($"{BaseErrorCode}.ProductStockIdInvalid");
 
         public static readonly Error InSufficientStock = Error.Validation($"{BaseErrorCode}.{nameof(InSufficientStock)}");

@@ -10,12 +10,14 @@ public sealed record ListProductsQuery : IRequest<Result<PaginatedList<ProductLi
     public int Page { get; init; } = 1;
     public int Size { get; init; } = 30;
 
-    public Guid? BrandId { get; init; }
-    public long? CategoryId { get; init; }
+    public Guid? BrandId { get; init; } = null;
+    public long? CategoryId { get; init; }= null;
 
-    public int? MaxPrice { get; init; } 
-    public string? SearchQuery { get; init; }
+    public int? MaxPrice { get; init; }= null;
+    public string? SearchQuery { get; init; }= null;
 
+
+    public bool OnlyGoodRatedProducts { get; init; } = false;
     public bool DiscountedProductsOnly { get; init; } = false;
 
     internal BrandId? ParsedBrandId =>

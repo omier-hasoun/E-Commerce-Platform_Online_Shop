@@ -8,13 +8,24 @@ using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services.Storage.Images;
 
-internal sealed class ImagesStorageService(IImageJobWriter imageJobWriter, IWebHostEnvironment webEnv, IFileStorageService fileStore, IOptions<MediaOptions> options) : IImageStorageService
+internal sealed class ImagesStorageService : IImageStorageService
 {
-    private readonly string _originalImagesDirPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Original);
-    private readonly string _smallImagesPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Small);
-    private readonly string _mediumImagesPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Medium);
-    private readonly string _largeImagesPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Large);
+    private readonly string _originalImagesDirPath;
+    private readonly string _smallImagesPath;
+    private readonly string _mediumImagesPath;
+    private readonly string _largeImagesPath;
+    private readonly IImageJobWriter _imageJobWriter;
+    private readonly IFileStorageService _fileStore;
+    public ImagesStorageService(IImageJobWriter imageJobWriter, IWebHostEnvironment webEnv, IFileStorageService fileStore, IOptions<MediaOptions> options)
+    {
+        _imageJobWriter = imageJobWriter;
+        this._fileStore = fileStore;
+        _originalImagesDirPath= Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Original);
+        _smallImagesPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Small);
+        _mediumImagesPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Medium);
+        _largeImagesPath = Path.Combine(webEnv.WebRootPath, options.Value.Images.Products.Large);
 
+    }
 
     public Result<Success> DeleteAll(List<string> fileNames)
     {
@@ -27,7 +38,7 @@ internal sealed class ImagesStorageService(IImageJobWriter imageJobWriter, IWebH
 
         });
 
-        fileStore.DeleteAllFiles(filePaths);
+        _fileStore.DeleteAllFiles(filePaths);
         return Result.Success;
     }
 
@@ -43,7 +54,7 @@ internal sealed class ImagesStorageService(IImageJobWriter imageJobWriter, IWebH
             var filePath = Path.Combine(_originalImagesDirPath, image.InternalFileName);
             imageProcessJobs.Add(new ImageProcessingJob(filePath));
 
-            if (await fileStore.SaveAsync(image.ContentStream, filePath, ct) is false)
+            if (await _fileStore.SaveAsync(image.ContentStream, filePath, ct) is false)
             {
                 if (imageProcessJobs.Count > 0)
                 {
@@ -51,7 +62,7 @@ internal sealed class ImagesStorageService(IImageJobWriter imageJobWriter, IWebH
 
                     imageProcessJobs.ForEach(x => savedImages.Add(x.FileName));
 
-                    fileStore.DeleteAllFiles(savedImages);
+                    _fileStore.DeleteAllFiles(savedImages);
                 }
 
                 return ApplicationErrors.Unexpected.CouldntSaveImage;
@@ -59,7 +70,7 @@ internal sealed class ImagesStorageService(IImageJobWriter imageJobWriter, IWebH
 
         }
 
-        await imageJobWriter.WriteAllAsync(imageProcessJobs);
+        await _imageJobWriter.WriteAllAsync(imageProcessJobs);
 
         return Result.Success;
     }

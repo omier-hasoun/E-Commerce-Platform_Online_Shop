@@ -29,7 +29,7 @@ internal sealed class BrandConfig : BaseEntityConfig<Brand>
                .HasMaxLength(BrandRules.MaxNameLength)
                .IsRequired();
 
-        builder.Property(x => x.SkuName)
+        builder.Property(x => x.Slug)
                .HasColumnType("VARCHAR")
                .HasMaxLength(BrandRules.MaxSkuNameLength)
                .IsRequired();
@@ -44,6 +44,17 @@ internal sealed class BrandConfig : BaseEntityConfig<Brand>
                .HasMaxLength(255)
                .IsRequired(false);
 
+        builder.HasIndex(x => x.Name)
+               .IsUnique()
+               .HasDatabaseName("IX_Brands_Name");
+
+        builder.HasIndex(x => x.CompanyName)
+               .IsUnique()
+               .HasDatabaseName("IX_Brands_CompanyName");
+
+        builder.HasIndex(x => x.Slug)
+               .IsUnique()
+               .HasDatabaseName("IX_Brands_Slug");
 
         builder.ToTable("Brands");
     }

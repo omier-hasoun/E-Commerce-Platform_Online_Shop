@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirm your email</title>
+  <link rel="stylesheet" href="authentication-flow.css">
+
+</head>
+<body>
+  <main class="card center">
+
+    <!-- State 1: waiting. Hide this (add hidden) once the email is confirmed. -->
+    <section id="state-waiting">
+      <div class="spinner" aria-hidden="true"></div>
+      <h1>Check your email</h1>
+      <p class="sub">We sent a confirmation link to your email. Click it to activate your account. This page updates when you do.</p>
+      <p class="foot">Didn't get it? <a href="#" id="resend">Send it again</a></p>
+    </section>
+
+    <!-- State 2: confirmed. Remove hidden when the email is confirmed. -->
+    <section id="state-confirmed" role="status" hidden>
+      <div class="check" aria-hidden="true">&#10003;</div>
+      <h1>Email confirmed</h1>
+      <p class="sub">Your email address has been confirmed. You can now log in.</p>
+      <a class="btn" href="login.html">Continue to log in</a>
+    </section>
+
+  </main>
+</body>
+</html>

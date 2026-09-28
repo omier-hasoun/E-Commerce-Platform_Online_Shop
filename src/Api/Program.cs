@@ -55,9 +55,12 @@ namespace Api
 
             app.UseHttpsRedirection();
 
-            app.UseDefaultFiles();
+            app.UseDefaultFiles(new DefaultFilesOptions
+            {
+                DefaultFileNames = new List<string> { "home.html" }
+            });
             app.UseStaticFiles();
-
+            app.MapFallbackToFile("home.html");
             app.UseRouting();
 
             app.UseAuthentication();
@@ -94,9 +97,24 @@ namespace Api
             app.MapControllers();
 
             app.MapStripeWebhookEndpoints();
+
             app.MapGroup("/api/auth").
                 MapIdentityApi<AppUser>();
-            Console.WriteLine(builder.Environment.WebRootPath);
+
+            app.MapPost("api/auth/logout", async (
+                SignInManager<AppUser> signInManager,
+                [FromBody] object empty) =>
+            {
+                if (empty != null)
+                {
+                    await signInManager.SignOutAsync();
+                    return Results.Ok();
+                }
+
+                return Results.Unauthorized();
+            })
+            .RequireAuthorization();
+
             await app.RunAsync();
         }
     }

@@ -22,7 +22,7 @@ public sealed class LongAsStringJsonConverter : JsonConverter<long>
             case JsonTokenType.String:
                 var str = reader.GetString();
 
-                if (ulong.TryParse(str, out var parsed))
+                if (long.TryParse(str, out var parsed))
                     return (long)parsed;
 
                 break;

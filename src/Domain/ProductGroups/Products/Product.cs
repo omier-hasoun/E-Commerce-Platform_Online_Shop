@@ -10,7 +10,7 @@ public sealed class Product : BaseEntity<ProductId>
     }
 
     private Product(ProductId id, ProductGroupId productsGroupId, Money? discountPrice, Money originalPrice, Money currentPrice, byte? discountPercentage, DateOnly? discountExpiresOn, ProductState status,
-        int width, int height, int length, int weight, string sku, string slug, string barCode, Dictionary<string, string> specifications, List<ProductImage> images)
+        int width, int height, int length, int weight, string sku, string slug, string barCode, Dictionary<string, string> variantSpecifications, List<ProductImage> images)
         : base(id)
     {
         ProductGroupId = productsGroupId;
@@ -30,17 +30,17 @@ public sealed class Product : BaseEntity<ProductId>
         Slug = slug;
         BarCode = barCode;
         _images = images;
-        _specifications = specifications;
+        _variantSpecifications = variantSpecifications;
     }
 
     public static Result<Product> Create(ProductId id, ProductGroupId productsGroupId, Money originalPrice, int width, int height, int length,
-        int weight, string sku, string slug, string barCode, Dictionary<string, string> specifications, List<ProductImage>? images = null)
+        int weight, string sku, string slug, string barCode, Dictionary<string, string> variantSpecifications, List<ProductImage>? images = null)
     {
         var validationResult = Result.ValidateAll(
                                 () => id.IsValid(),
                                 () => ValidatePrice(originalPrice),
                                 () => Validate_Width_Height_Length(width, height, length),
-                                () => ValidateSpecifications(specifications),
+                                () => ValidateVariantSpecifications(variantSpecifications),
                                 () => ValidateSku(sku),
                                 () => ValidateSlug(slug),
                                 () => ValidateBarcode(barCode));
@@ -51,7 +51,6 @@ public sealed class Product : BaseEntity<ProductId>
         }
 
         //defaults
-
         byte? discountPercentage = null;
         Money? priceBeforeDisount = null;
         Money currentPrice = originalPrice;
@@ -61,9 +60,8 @@ public sealed class Product : BaseEntity<ProductId>
         ProductState status = ProductState.Draft;
         images ??= [];
 
-
         return new Product(id, productsGroupId, priceBeforeDisount, originalPrice, currentPrice, discountPercentage, discountExpiresOn, status,
-            width, height, length, weight, sku, slug, barCode, specifications, images);
+            width, height, length, weight, sku, slug, barCode, variantSpecifications, images);
     }
 
     public ProductGroupId ProductGroupId { get; private init; }
@@ -116,8 +114,8 @@ public sealed class Product : BaseEntity<ProductId>
     public IReadOnlyCollection<ProductImage> Images { get { return _images.AsReadOnly(); } private set { _images = value is null ? [] : value.ToList(); } }
 
 
-    private Dictionary<string, string> _specifications = [];
-    public IReadOnlyDictionary<string, string> Specifications { get { return _specifications.AsReadOnly(); } private set { _specifications = value is null ? [] : value.ToDictionary(); } }
+    private Dictionary<string, string> _variantSpecifications = [];
+    public IReadOnlyDictionary<string, string> VariantSpecifications { get { return _variantSpecifications.AsReadOnly(); } private set { _variantSpecifications = value is null ? [] : value.ToDictionary(); } }
 
     public Result<Updated> AddImages(List<string> fileNames)
     {
@@ -352,7 +350,7 @@ public sealed class Product : BaseEntity<ProductId>
         return Result.Success;
     }
 
-    private static Result<Success> ValidateSpecifications(Dictionary<string, string> specifications)
+    private static Result<Success> ValidateVariantSpecifications(Dictionary<string, string> specifications)
     {
         if (specifications is null || specifications.Count == 0)
         {

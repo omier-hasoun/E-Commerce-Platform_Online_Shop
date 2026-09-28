@@ -1,0 +1,33 @@
+#closeDialogBtn{
+    display:block;
+    cursor:pointer;
+    margin-left: auto;
+    margin-top: 1rem;
+    margin-right: 1rem;
+    width:35px;
+    height:35px;
+    border-radius: 20px;
+    border: 2px solid  red;
+
+}
+
+dialog {
+    width: inherit;
+    height: inherit;
+    max-width: none;
+    max-height: none;
+
+    border: none;
+    place-items: start center;
+
+    flex-direction: column;
+}
+
+app-dialog{
+    display:none;
+}
+
+[dialog]:open{
+
+    display: flex;
+}

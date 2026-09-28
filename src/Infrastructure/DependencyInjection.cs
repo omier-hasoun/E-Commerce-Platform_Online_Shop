@@ -1,8 +1,10 @@
 #region usings
 using System.Threading.Channels;
 using Application.Entities;
+using Domain.Brands;
 using Domain.Carts;
 using Domain.Carts.CartItems;
+using Domain.Categories;
 using Domain.Common.Entities.Addresses;
 using Domain.Orders;
 using Domain.Orders.OrderLines;
@@ -34,7 +36,7 @@ using Shippo;
 using App = Application.Common.Abstractions;
 #endregion
 
-namespace Infrastructure; 
+namespace Infrastructure;
 
 public static class DependencyInjection
 {
@@ -97,7 +99,7 @@ public static class DependencyInjection
                 SingleReader = true,
                 AllowSynchronousContinuations = false,
             });
-            
+
          });
 
         services.AddSingleton<IProductThumbnailUrlProvider, ProductThumbnailUrlProvider>();
@@ -137,7 +139,7 @@ public static class DependencyInjection
         {
             options.Retry.MaxRetryAttempts = 1;
 
-            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(15);  
+            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(15);
             options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(20);
 
         });
@@ -155,13 +157,16 @@ public static class DependencyInjection
         services.AddSingleton<App.IIdGenerator<ProductId>, ProductIdGenerator>();
 
         services.AddSingleton<App.IIdGenerator<OrderLineId>, OrderLineIdGenerator>();
+        services.AddSingleton<App.IIdGenerator<CategoryId>, CategoryIdGenerator>();
+
+        services.AddSingleton<App.IIdGenerator<BrandId>, BrandIdGenerator>();
 
         services.AddSingleton<App.IIdGenerator<OrderId>, OrderIdGenerator>();
         services.AddSingleton<App.IIdGenerator<CartId>, CartIdGenerator>();
         services.AddSingleton<App.IIdGenerator<CartItemId>, CartItemIdGenerator>();
         services.AddSingleton<App.IIdGenerator<WarehouseId>, WarehouseIdGenerator>();
         services.AddSingleton<App.IIdGenerator<AddressId>, AddressIdGenerator>();
-        
+
         return services;
     }
 
@@ -205,7 +210,7 @@ public static class DependencyInjection
 
 
         services.AddTransient<IEmailSender<AppUser>, SecurityEmailSender>();
-        
+
         services.AddScoped<IPasswordHasher<AppUser>, UserPasswordHashService>();
 
         return services;

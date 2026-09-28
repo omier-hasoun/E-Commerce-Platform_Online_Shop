@@ -15,7 +15,7 @@ internal sealed class GetProductsGroupByIdQueryHandler(IAppDbContext context) : 
                                                     (pg, u) => new { pg, u }
                                               )
                                               .Select(
-                                                  x => new ProductGroupDto(x.pg.Id, x.pg.Title, x.pg.Description, x.pg.Attributes,
+                                                  x => new ProductGroupDto(x.pg.Id, x.pg.Title, x.pg.Description, x.pg.Specifications,
                                                             x.pg.BrandId, x.pg.BrandName, x.pg.CategoryId, x.pg.CategoryName, x.pg.AverageRating, x.pg.LastModifiedAt,
                                                             x.pg.LastModifiedBy, x.u.UserName!,
 

@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hello</title>
-    <link rel="stylesheet" href="/css/app.css">
-    <link rel="stylesheet" href="/css/product-card.css">
+    <title>products</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/shared.css">
+    <link data-page-css rel="stylesheet" href="/css/pages/products.css">
 
     <script type="module" src="/js/app.js"></script>
 </head>
@@ -16,7 +17,62 @@
     <div id="sidebar">
     </div>
 
-    <main id="content"></main>
+    <main id="content">
+        <div class="page">
+            <app-dialog id="filtersDialog">
+                <h3>Filters:</h3>
+                <div class="filter-options">
+
+                    <div class="filter-option">
+                        <label for="maxPriceInput">
+                            Max price:
+                        </label>
+                        <input id="maxPriceInput" type="number" value="0" step="5">
+                    </div>
+
+                    <div class="filter-option">
+                        <label for="brandSelector">
+                            Brand:
+                        </label>
+                        <brand-selector id="brandSelector" class="brand-selector"></brand-selector>
+                    </div>
+
+                    <div class="filter-option">
+                        <label for="categorySelector">
+                            Category:
+                        </label>
+                        <category-selector id="categorySelector" class="category-selector"></category-selector>
+                    </div>
+                    <div class="filter-option">
+                        <label for="discount">
+                            discount:
+                        </label>
+                        <input id="discount" type="checkbox"></input>
+                    </div>
+                    <div class="filter-option">
+                        <label for="goodRating">
+                            Only good rated products:
+                        </label>
+                        <input id="goodRatingOnly" type="checkbox"></input>
+                    </div>
+
+
+                    <form method="dialog" class="apply-filters">
+                        <button id="submitFiltersBtn" class="rounded-btn applyFiltersBtn" type="submit">Apply</button>
+                    </form>
+                </div>
+            </app-dialog>
+
+
+            <button id="showFiltersBtn" class="filters-btn rounded-btn">
+                Filters
+            </button>
+            <div id="productsContainer">
+            </div>
+            <app-paginator id="paginator" class="paginator">
+            </app-paginator>
+        </div>
+    </main>
 
     <app-footer></app-footer>
 </body>

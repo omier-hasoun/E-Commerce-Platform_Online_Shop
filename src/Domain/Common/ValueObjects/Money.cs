@@ -12,7 +12,7 @@ public sealed record Money
 
     internal Money()
     {
-        
+
     }
 
     [JsonConstructor]
@@ -34,6 +34,13 @@ public sealed record Money
             Value = value
         };
     }
+
+    public static Money Create(long value)
+    {
+        return Create((decimal)value);
+    }
+
+
     public static Money FromCents(long value)
     {
         if (ValHelper.IsOutOfRange(value, 0, _maxCentsvalue))

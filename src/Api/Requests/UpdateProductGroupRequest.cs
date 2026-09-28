@@ -12,10 +12,10 @@ public sealed record UpdateProductGroupRequest
 
     public bool? IsSerialized { get; init; }
 
-    public Dictionary<string, string>? Attributes { get; init; }
+    public Dictionary<string, string>? Specifications { get; init; }
 
     public UpdateProductGroupRequest()
     {
     }
-    
+
 }

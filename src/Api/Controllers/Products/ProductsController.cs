@@ -1,5 +1,5 @@
 
-using Application.Features.Public.Products.Queries.GetProductGroupById;
+using Application.Features.Public.Products.Queries.GetProductById;
 using Application.Features.Public.Products.Queries.ListProducts;
 using MediatR;
 
@@ -19,11 +19,11 @@ public sealed class ProductsController(IMediator mediator) : ApiController
         return result.Match((response) => Ok(response), Problem);
     }
 
-    [HttpGet("{id:required}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById([FromRoute] long id, CancellationToken ct)
     {
 
-        var result = await mediator.Send(new GetProductGroupByIdQuery(id), ct);
+        var result = await mediator.Send(new GetProductByIdQuery(id), ct);
 
         return result.Match((response) => Ok(response), Problem);
     }

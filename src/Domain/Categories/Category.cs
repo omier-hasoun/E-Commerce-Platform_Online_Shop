@@ -8,12 +8,15 @@ public class Category : AggregateRoot<CategoryId>
         Name = name;
         ParentCategoryId = parentCategoryId;
     }
-    
+
     public static Result<Category> Create(CategoryId id, string name, CategoryId? parentCategoryId)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            return DomainErrors.Categories.InvalidName;
+
         return new Category(id, name, parentCategoryId);
     }
-    
+
     public CategoryId? ParentCategoryId { get; private set; }
     public string Name { get; private set; } = null!;
 }

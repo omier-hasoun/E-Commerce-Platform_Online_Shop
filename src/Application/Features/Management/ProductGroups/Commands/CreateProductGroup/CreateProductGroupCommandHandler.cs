@@ -38,7 +38,7 @@ internal sealed class CreateProductGroupCommandHandler(IAppDbContext context, II
             command.Title,
             command.Description,
             command.IsSerialized,
-            command.Attributes
+            command.Specifications
         );
 
         if (createProductResult.Failed)
@@ -49,8 +49,8 @@ internal sealed class CreateProductGroupCommandHandler(IAppDbContext context, II
         context.ProductGroups.Add(createProductResult.Value);
 
         await context.SaveAsync(ct);
-            
+
         return productId.Value;
     }
-    
+
 }

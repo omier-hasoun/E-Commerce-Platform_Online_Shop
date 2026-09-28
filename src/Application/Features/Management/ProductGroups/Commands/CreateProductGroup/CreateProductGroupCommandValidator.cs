@@ -16,16 +16,16 @@ internal sealed class CreateProductGroupCommandValidator : AbstractValidator<Cre
 
         RuleFor(x => x.CategoryId).NotEmpty();
 
-        RuleFor(x => x.Attributes).NotEmpty()
-                                  .Must(x => x.Count <= ProductGroupRules.MaxNumberOfAttributes)
-                                  .WithMessage($"Attributes cannot exceed {ProductGroupRules.MaxNumberOfAttributes} values");
+        RuleFor(x => x.Specifications).NotEmpty()
+                                  .Must(x => x.Count <= ProductGroupRules.MaxNumberOfSpecifications)
+                                  .WithMessage($"Specifications cannot exceed {ProductGroupRules.MaxNumberOfSpecifications} values");
 
-        RuleForEach(x => x.Attributes)
-                                    .Must(kv => kv.Key.Length <= 50 && !string.IsNullOrWhiteSpace(kv.Key) )
+        RuleForEach(x => x.Specifications)
+                                    .Must(kv => kv.Key.Length <= 50 && !string.IsNullOrWhiteSpace(kv.Key))
                                     .WithMessage("Invalid key. It cannot be empty or too long");
 
-        RuleForEach(x => x.Attributes)
-                                .Must(kv =>  kv.Value.Length <= 50! && string.IsNullOrWhiteSpace(kv.Value))
+        RuleForEach(x => x.Specifications)
+                                .Must(kv => kv.Value.Length <= 50! && string.IsNullOrWhiteSpace(kv.Value))
                                 .WithMessage("Invalid value. It cannot be empty or too long");
 
 
@@ -33,4 +33,3 @@ internal sealed class CreateProductGroupCommandValidator : AbstractValidator<Cre
 
     }
 }
-

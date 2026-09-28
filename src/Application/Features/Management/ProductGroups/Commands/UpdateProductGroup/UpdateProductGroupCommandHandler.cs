@@ -23,7 +23,7 @@ internal sealed class UpdateProductGroupCommandHandler(IAppDbContext context) : 
         }
 
 
-        BrandId? brandId = command.BrandId  is null ? null : new (command.BrandId.Value);
+        BrandId? brandId = command.BrandId is null ? null : new(command.BrandId.Value);
 
         CategoryId? categoryId = command.CategoryId is null ? null : new(command.CategoryId.Value);
 
@@ -41,7 +41,7 @@ internal sealed class UpdateProductGroupCommandHandler(IAppDbContext context) : 
         if (brandName is null || categoryName is null)
             return brandName is null ? ApplicationErrors.NotFound.Brand : ApplicationErrors.NotFound.Category;
 
-        var updateResult = productGroup.Update(brandId, brandName, categoryId, categoryName, command.Title, command.Description, command.IsSerialized, command.Attributes);
+        var updateResult = productGroup.Update(brandId, brandName, categoryId, categoryName, command.Title, command.Description, command.IsSerialized, command.Specifications);
 
         if (updateResult.Failed)
             return updateResult.Errors;

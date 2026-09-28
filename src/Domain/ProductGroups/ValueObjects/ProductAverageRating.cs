@@ -19,14 +19,14 @@ public sealed record ProductAverageRating
 
     private ProductAverageRating()
     {
-        
+
     }
 
     public decimal Value { get; internal init; } = 0;
 
     public float GetRoundedValue()
     {
-        return (float)Math.Round(Value, 2);
+        return (float)Math.Round(Value, 1);
     }
 
     public static Result<ProductAverageRating> From(decimal value)
@@ -42,5 +42,15 @@ public sealed record ProductAverageRating
         };
     }
 
+    public static Result<ProductAverageRating> From(long value)
+    {
+        return From((decimal)value);
+    }
+
     public static explicit operator float(ProductAverageRating value) => (float)value.Value;
+
+    public static bool operator >(ProductAverageRating left, ProductAverageRating right) =>
+        left is not null && right is not null && left.Value > right.Value;
+    public static bool operator <(ProductAverageRating left, ProductAverageRating right) =>
+        left is not null && right is not null && left.Value < right.Value;
 }

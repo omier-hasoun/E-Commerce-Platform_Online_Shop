@@ -24,13 +24,13 @@ namespace Application.Common.Abstractions;
 public interface IAppDbContext
 
 {
-    DbSet<AppUser> Users {get; }
+    DbSet<AppUser> Users { get; }
 
-    DbSet<Order> Orders {get; }
-    DbSet<OrderLine> OrderLines {get; }
+    DbSet<Order> Orders { get; }
+    DbSet<OrderLine> OrderLines { get; }
 
-    DbSet<ProductReview> ProductReviews {get; }
-    DbSet<ProductGroup> ProductGroups {get; }
+    DbSet<ProductReview> ProductReviews { get; }
+    DbSet<ProductGroup> ProductGroups { get; }
     DbSet<Product> Products { get; }
 
     DbSet<Brand> Brands { get; }
@@ -52,14 +52,14 @@ public interface IAppDbContext
     DbSet<ReturnItemRequest> ReturnRequests { get; }
     DbSet<ReturnItemRequestReview> ReturnItemRequestReviews { get; }
 
-    DbSet<Address> Addresses {get; }
+    DbSet<Address> Addresses { get; }
     DbSet<UserShippingAddress> ShippingAddresses { get; }
 
     DbSet<Cart> Carts { get; }
 
-    DbSet<CartItem> CartItems {get; }
+    DbSet<CartItem> CartItems { get; }
 
-    DbSet<Shipment> Shipments {get; }
+    DbSet<Shipment> Shipments { get; }
 
     Task SaveAsync(CancellationToken ct = default);
 }
