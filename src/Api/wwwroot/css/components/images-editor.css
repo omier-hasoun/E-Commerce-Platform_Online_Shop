@@ -1,0 +1,301 @@
+
+    /* Global Page Styling */
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --radius: 8px;
+    }
+
+    .container {
+      max-width: 2000px;
+      margin: 0 auto;
+    }
+
+    images-editor h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Embedded Component CSS (normally product-image-manager.css) */
+    images-editor {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* File Drop Zone */
+    .pim-dropzone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1rem;
+      text-align: center;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 1.5rem;
+    }
+
+    .pim-dropzone:hover, .pim-dropzone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .pim-dropzone-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 0.75rem;
+      color: var(--primary);
+    }
+
+    .pim-dropzone p {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .pim-dropzone span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    .pim-input-file { display: none; }
+
+    /* URL Import Row */
+    .pim-url-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pim-url-input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      outline: none;
+    }
+
+    .pim-url-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .pim-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      transition: background 0.15s ease;
+    }
+
+    .pim-btn:hover { background: var(--primary-hover); }
+
+    .pim-btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .pim-btn-secondary:hover {
+      background: #f1f5f9;
+    }
+
+    /* Images Grid */
+    .pim-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    /* Individual Card */
+    .pim-card {
+      position: relative;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      touch-action: none; /* Prevents default scroll while dragging on touch */
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pim-card.is-cover {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    .pim-card.is-dragging {
+      opacity: 0.4;
+      transform: scale(0.96);
+    }
+
+    /* Image Wrapper & Preview */
+    .pim-img-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #f1f5f9;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+    }
+
+    .pim-img-wrap:active { cursor: grabbing; }
+
+    .pim-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+      pointer-events: none;
+    }
+
+    /* Badges */
+    .pim-badge {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      background: #0f172a;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    .pim-badge.cover-badge {
+      background: var(--primary);
+    }
+
+    /* Action Toolbar on Card */
+    .pim-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem;
+      background: white;
+      border-top: 1px solid var(--border);
+    }
+
+    .pim-action-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pim-action-btn:hover {
+      color: var(--text);
+      background: #f1f5f9;
+    }
+
+    .pim-action-btn.delete-btn:hover {
+      color: var(--danger);
+      background: #fef2f2;
+    }
+
+    .pim-cover-btn {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .pim-cover-btn:hover {
+      background: var(--primary-light);
+    }
+
+    /* Drag Ghost Overlay */
+    .pim-drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.85;
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      overflow: hidden;
+      width: 140px;
+      height: 140px;
+    }
+
+    .pim-drag-ghost img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Output JSON View */
+    .pim-output {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .pim-output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .pim-output-header h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    pre {
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      overflow-x: auto;
+      max-height: 180px;
+    }

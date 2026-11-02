@@ -26,7 +26,6 @@ namespace Api
 
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
-
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -34,7 +33,8 @@ namespace Api
                 ApplicationDbContextInitialiser initialiser = new(scope.ServiceProvider.GetRequiredService<ILogger<ApplicationDbContextInitialiser>>(),
                     scope.ServiceProvider.GetRequiredService<AppDbContext>(),
                     scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(),
-                    scope.ServiceProvider.GetRequiredService<RoleManager<Role>>());
+                    scope.ServiceProvider.GetRequiredService<RoleManager<Role>>(),
+                    scope.ServiceProvider.GetRequiredService<IMediator>());
 
                 await initialiser.InitialiseAndSeedData();
             }

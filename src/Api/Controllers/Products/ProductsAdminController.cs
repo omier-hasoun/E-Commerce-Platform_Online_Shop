@@ -1,36 +1,77 @@
-
-using Application.Features.Management.ProductGroups.Commands.CreateProductGroup;
-using Application.Features.Management.ProductGroups.Commands.AddProduct;
-using Application.Features.Management.ProductGroups.Commands.AddImages;
-using Application.Features.Management.ProductGroups.Commands.UpdateProductGroup;
-using Application.Features.Management.ProductGroups.Queries.ListProductGroups;
-using Application.Features.Management.ProductGroups.Queries.GetProductsGroupById;
-using Application.Features.Management.ProductGroups.Commands.PublishProduct;
-using Application.Features.Management.ProductGroups.Commands.UnpublishProduct;
-using Application.Features.Management.ProductGroups.Commands.ArchiveProductGroup;
-using Application.Features.Management.ProductGroups.Queries.GetProductById;
-using Application.Features.Management.ProductGroups.Commands.UpdateImagesSortOrder;
+using Application.Features.Management.Products.Commands.UpdateProduct;
+using Application.Features.Management.Products.Commands.PublishProduct;
+using Application.Features.Management.Products.Commands.UnpublishProduct;
+using Application.Features.Management.Products.Commands.ArchiveProduct;
 using Api.Extensions;
-using Application.Features.Management.ProductGroups.Commands.RemoveImages;
-using Application.Features.Management.ProductGroups.Commands.ApplyDiscount;
-using Application.Features.Management.ProductGroups.Commands.RestockProduct;
+using Application.Features.Management.Products.Commands.ApplyDiscount;
+using Application.Features.Management.Products.Commands.RestockProduct;
+using Application.Features.Management.Products.Commands.CreateProduct;
+using Application.Features.Management.Products.Dtos;
+using Application.Features.Management.Products.Commands.UpdateImages;
+
+using Application.Features.Management.Products.Queries.GetProductById;
+using Application.Features.Management.Products.Queries.ListProducts;
+
+using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 namespace Api.Controllers.Products;
 
-[Route("api/management/")]
-public sealed class ProductsAdminController(IMediator mediator, IUniqueImageNameProvider fileNameGen) : ApiController
+[Route("api/management/products")]
+public sealed class ProductsAdminController(IMediator mediator, IUniqueImageNameProvider fileNameGen, IOptions<JsonOptions> mvcJsonOptions) : ApiController
 {
     #region commands
 
-    [HttpPost("product-group")]
-    public async Task<IActionResult> CreateProductGroup([FromBody] CreateProductGroupCommand request, CancellationToken ct)
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateProductGroup([FromForm] CreateProductRequest request, CancellationToken ct)
     {
 
-        var result = await mediator.Send(request, ct);
+        // Deserialize images details
+        List<ImageDetails>? imagesDetails = null;
+        if (!string.IsNullOrEmpty(request.ImagesDetailsJson))
+        {
+            imagesDetails = JsonSerializer.Deserialize<List<ImageDetails>>(request.ImagesDetailsJson, mvcJsonOptions.Value.JsonSerializerOptions);
+        }
+
+        // Deserialize specifications
+        Dictionary<string, string>? specifications = null;
+        if (!string.IsNullOrEmpty(request.Specifications))
+        {
+            specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Specifications);
+        }
+
+        var images = request.ImagesFiles?.Select(x => x.ToDto(fileNameGen.GenerateWithExtension(".webp")))
+                                .ToList();
+
+        var command = new CreateProductCommand
+        (
+            request.BrandId,
+            request.CategoryId,
+            request.Title,
+            request.Description,
+            request.IsSerialized,
+            request.Price,
+            request.Width,
+            request.Height,
+            request.Length,
+            request.Weight,
+            request.Sku,
+            request.BarCode,
+            request.Slug,
+            request.Inventory,
+            imagesDetails,
+            images,
+            specifications
+        );
+
+
+
+        var result = await mediator.Send(command, ct);
 
         return result.Match(response => Created(
                 Url.Action(
-                    nameof(GetProductGroupById),
+                    nameof(GetProductById),
                     "ProductsManagement",
                     new { Id = response }),
 
@@ -40,167 +81,98 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
         );
     }
 
-    [HttpPatch("product-group/{id}")]
-    public async Task<IActionResult> UpdateProductGroup(long id, [FromBody] UpdateProductGroupRequest request, CancellationToken ct)
-    {
-        var command = new UpdateProductGroupCommand(
-            id,
-            request.BrandId,
-            request.CategoryId,
-            request.Title,
-            request.Description,
-            request.IsSerialized,
-            request.Specifications);
-
-        var result = await mediator.Send(command, ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPost("product-group/{id}/products")]
+    [HttpPut("{productId}")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> AddProduct(long id, [FromForm] AddProductRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateProduct(
+      long productId,
+      [FromForm] UpdateProductRequest request,
+      CancellationToken ct)
     {
-        List<FileUploadDto>? imagesDto = null;
-        if (request.Images != null && request.Images.Count > 0)
-        {
-            imagesDto = new(request.Images.Count);
-            request.Images.ForEach(image => imagesDto.Add(
 
-                new FileUploadDto
-                {
-                    InternalFileName = fileNameGen.Generate() + ".webp",
-                    ContentStream = image.OpenReadStream(),
-                    ContentLength = image.Length,
-                    MediaType = image.ContentType,
-                    OriginalFileName = image.FileName,
-                }
-            ));
+        // Deserialize images details
+        List<ImageDetails>? imagesDetails = null;
+        if (!string.IsNullOrEmpty(request.ImagesDetailsJson))
+        {
+            imagesDetails = JsonSerializer.Deserialize<List<ImageDetails>>(request.ImagesDetailsJson, mvcJsonOptions.Value.JsonSerializerOptions);
         }
 
-
-
-        var command = new AddProductCommand(
-            id,
-            request.Price,
-            request.Width,
-            request.Height,
-            request.Length,
-            request.Weight,
-            request.Sku,
-            request.Slug,
-            request.BarCode,
-            request.Specifications,
-            imagesDto,
-            request.StockPerWarehouse);
-
-        var result = await mediator.Send(command, ct);
-
-        return result.Match((response) =>
-
-        Created(
-            Url.Action(nameof(GetProductById), "ProductsManagement", new { Id = response }),
-            new { Id = response }),
-
-            Problem
-        );
-    }
-
-
-    [HttpPost("product-group/{id}/publish")]
-    public async Task<IActionResult> PublishProductGroup(long id, CancellationToken ct)
-    {
-
-        var result = await mediator.Send(new PublishProductGroupCommand(id), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-    [HttpPost("product-group/{id}/unpublish")]
-    public async Task<IActionResult> UnpublishProductGroup(long id, CancellationToken ct)
-    {
-
-        var result = await mediator.Send(new UnpublishProductGroupCommand(id), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPost("product-group/{id}/archive")]
-    public async Task<IActionResult> ArchiveProductGroup(long id, CancellationToken ct)
-    {
-
-        var result = await mediator.Send(new ArchiveProductGroupCommand(id), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPost("product-group/{productGroupId}/products/{productId}/apply-discount")]
-    public async Task<IActionResult> ApplyDiscount(long productGroupId, long productId, [FromBody] ApplyDiscountRequest request, CancellationToken ct)
-    {
-
-        var result = await mediator.Send(new ApplyDiscountCommand(productGroupId, productId, request.DiscountExpiresOn, request.DiscountPercentage), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPost("product-group/{productGroupId}/products/{productId}/publish")]
-    public async Task<IActionResult> PublishProduct(long productGroupId, long productId, CancellationToken ct)
-    {
-        var result = await mediator.Send(new PublishProductCommand(productGroupId, productId), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPost("product-group/{productGroupId}/products/{productId}/unpublish")]
-    public async Task<IActionResult> UnpublishProduct(long productGroupId, long productId, CancellationToken ct)
-    {
-        var result = await mediator.Send(new UnpublishProductCommand(productGroupId, productId), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPost("products/{productId}/inventory/{warehouseId}")]
-    public async Task<IActionResult> RestockProduct(long warehouseId, long productId, [FromBody] int stockQuantity, CancellationToken ct)
-    {
-        var result = await mediator.Send(new RestockProductCommand(warehouseId, productId, stockQuantity), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-    }
-
-    [HttpPut("product-group/{productGroupId}/products/{productId}/images")]
-    public async Task<IActionResult> UpdateImagesSortOrder(long productGroupId, long productId, [FromBody] UpdateImagesSortOrderRequest request, CancellationToken ct)
-    {
-
-        var result = await mediator.Send(new UpdateImagesSortOrderCommand(productGroupId, productId, request.Images), ct);
-
-        return result.Match((response) => NoContent(), Problem);
-
-    }
-
-    [HttpPost("product-group/{productGroupId}/products/{productId}/images")]
-    [Consumes("multipart/form-data")]
-    public async Task<IActionResult> AddImages(long productGroupId, long productId, [FromForm] IReadOnlyCollection<IFormFile> files, CancellationToken ct)
-    {
-        List<FileUploadDto> images = new(files.Count);
-
-        foreach (var file in files)
+        // Deserialize specifications
+        Dictionary<string, string>? specifications = null;
+        if (!string.IsNullOrEmpty(request.Specifications))
         {
-            images.Add(file.ToDto(fileNameGen.GenerateWithExtension(".webp")));
+            specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Specifications);
         }
 
-        var result = await mediator.Send(new AddImagesCommand(productGroupId, productId, images), ct);
+        var images = request.ImagesFiles?.Select(x => x.ToDto(fileNameGen.GenerateWithExtension(".webp")))
+                                .ToList();
 
-        return result.Match((response) => NoContent(), Problem);
+        {
+            var result = await mediator.Send(new UpdateImagesCommand
+            {
+                ProductId = productId,
+                NewFiles = images!,
+                Images = imagesDetails!
+            }, ct);
 
+            if(result.Failed)
+                return result.Match((response) => NoContent(), Problem);
+        }
+
+        {
+            var result = await mediator.Send(new UpdateProductCommand(
+                productId,
+                request.BrandId,
+                request.CategoryId,
+                request.Title,
+                request.Description,
+                request.IsSerialized,
+                request.Price,
+                request.Width,
+                request.Height,
+                request.Length,
+                request.Weight,
+                request.Sku,
+                request.Slug,
+                request.BarCode,
+                specifications));
+
+            return result.Match((response) => NoContent(), Problem);
+        }
     }
 
-    [HttpDelete("product-group/{productGroupId}/products/{productId}/images")]
-    public async Task<IActionResult> RemoveImages(long productGroupId, long productId, [FromBody] List<string> fileNames, CancellationToken ct)
+
+    [HttpPost("{productId}/archive")]
+    public async Task<IActionResult> ArchiveProductGroup(long productId, CancellationToken ct)
     {
 
-        var result = await mediator.Send(new RemoveImagesCommand(productGroupId, productId, fileNames), ct);
+        var result = await mediator.Send(new ArchiveProductCommand(productId), ct);
 
         return result.Match((response) => NoContent(), Problem);
+    }
 
+    [HttpPost("{productId}/apply-discount")]
+    public async Task<IActionResult> ApplyDiscount(long productId, [FromBody] ApplyDiscountRequest request, CancellationToken ct)
+    {
+
+        var result = await mediator.Send(new ApplyDiscountCommand(productId, request.DiscountExpiresOn, request.DiscountPercentage), ct);
+
+        return result.Match((response) => NoContent(), Problem);
+    }
+
+    [HttpPost("{productId}/publish")]
+    public async Task<IActionResult> PublishProduct(long productId, CancellationToken ct)
+    {
+        var result = await mediator.Send(new PublishProductCommand(productId), ct);
+
+        return result.Match((response) => NoContent(), Problem);
+    }
+
+    [HttpPost("{productId}/unpublish")]
+    public async Task<IActionResult> UnpublishProduct(long productId, CancellationToken ct)
+    {
+        var result = await mediator.Send(new UnpublishProductCommand(productId), ct);
+
+        return result.Match((response) => NoContent(), Problem);
     }
 
     #endregion
@@ -208,24 +180,15 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
 
     #region queries
 
-    [HttpGet("product-group")]
-    public async Task<IActionResult> ListProducts([FromQuery] ListProductGroupsQuery request, CancellationToken ct)
+    [HttpGet]
+    public async Task<IActionResult> ListProducts([FromQuery] ListProductsQuery request, CancellationToken ct)
     {
         var result = await mediator.Send(request, ct);
 
         return result.Match((response) => Ok(response), Problem);
     }
 
-    [HttpGet("product-group/{productGroupId}")]
-    public async Task<IActionResult> GetProductGroupById(long productGroupId, CancellationToken ct)
-    {
-
-        var result = await mediator.Send(new GetProductsGroupByIdQuery(productGroupId), ct);
-
-        return result.Match((response) => Ok(response), Problem);
-    }
-
-    [HttpGet("products/{productId}")]
+    [HttpGet("{productId}")]
     public async Task<IActionResult> GetProductById(long productId, CancellationToken ct)
     {
 
@@ -239,7 +202,7 @@ public sealed class ProductsAdminController(IMediator mediator, IUniqueImageName
 
 
 //[HttpPost("{productGroupId}/products/{productId}/archive")]
-//public async Task<IActionResult> ArchiveVariant(long productGroupId, long productId, CancellationToken ct)
+//public async Task<IActionResult> ArchiveVariant(long productId, CancellationToken ct)
 //{
 //    var result = await mediator.Send(new , ct);
 

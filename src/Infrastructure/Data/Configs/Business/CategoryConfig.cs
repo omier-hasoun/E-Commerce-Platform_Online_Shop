@@ -19,7 +19,7 @@ internal sealed class CategoryConfig : BaseEntityConfig<Category>
                .ValueGeneratedNever();
 
         builder.Property(x => x.Name)
-               .HasMaxLength(CategoryRules.MaxCategoryNameLength)
+               .HasMaxLength(CategoryRules.MaxCategoryNameLength * 2)
                .IsRequired();
 
         builder.HasOne<Category>()

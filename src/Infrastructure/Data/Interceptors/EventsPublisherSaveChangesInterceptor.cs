@@ -40,8 +40,8 @@ internal sealed class EventsPublisherSaveChangesInterceptor(TimeProvider time, [
                 })
                 .ToList();
 
-            eventData.Context.AddRange(outboxMessages);
-
+            if(outboxMessages.Count > 0)
+                eventData.Context.AddRange(outboxMessages);
 
         }
 

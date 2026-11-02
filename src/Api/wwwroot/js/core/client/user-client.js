@@ -18,7 +18,7 @@ export class UserClient
         url.searchParams.append("useCookies", "true");
         try
         {
-            const response = await fetch(url, {
+            await fetch(url, {
                 method: "POST",
                 headers: {
                     "Accept": "application/json",
@@ -33,7 +33,7 @@ export class UserClient
                 })
             });
 
-            
+
 
         }
         catch (error)

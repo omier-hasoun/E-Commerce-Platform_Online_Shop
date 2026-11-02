@@ -3,7 +3,7 @@ using Domain.ProductGroups.Products;
 
 namespace Application.Features.Public.Products.Queries.GetProductById;
 
-public sealed record GetProductByIdQuery(long ProductId) : IRequest<Result<ProductGroupDto>>
+public sealed record GetProductByIdQuery(long ProductId) : IRequest<Result<ProductDto>>
 {
     public ProductId ParsedProductId { get; } = new(ProductId);
 

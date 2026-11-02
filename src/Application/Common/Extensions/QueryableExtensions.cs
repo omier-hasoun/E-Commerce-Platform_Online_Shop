@@ -23,15 +23,7 @@ internal static class QueryableExtensions
         return query.Where(p => p.HasDiscount);
     }
 
-    public static IQueryable<Product> ApplyProductStatusesFilter(
-    this IQueryable<Product> query, List<ProductState> statuses)
-    {
-        if (statuses is null || statuses.Count == 0)
-            return query;
 
-        return query.Where(p => statuses.Contains(p.Status));
-
-    }
 
     public static IQueryable<Product> GetPubishedProducts(this IQueryable<Product> query)
     {
@@ -56,10 +48,12 @@ internal static class QueryableExtensions
         string? searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))
-            return query.OrderBy(x => x.Id);
+            return query;
+
+        var s = searchText.ToLower();
 
         return query.Where(
-            x => x.NormalizedTitle.Contains(searchText));
+            x => x.NormalizedTitle.Contains(s));
     }
     public static IQueryable<ProductGroup> ApplyBrandFilter(this IQueryable<ProductGroup> query, Guid? brandId)
     {
@@ -79,39 +73,40 @@ internal static class QueryableExtensions
         return query.Where(group => group.CategoryId == parsedId);
     }
 
-    public static IQueryable<ProductGroup> ApplyStatusesFilter(this IQueryable<ProductGroup> query, List<ProductGroupState>? statuses)
+    public static IQueryable<ProductGroup> ApplyStatusesFilter(this IQueryable<ProductGroup> query, List<ProductState>? statuses)
     {
         if (statuses is null || statuses.Count == 0)
             return query;
 
-        return query.Where(x => statuses.Contains(x.Status));
+        return query.Where(x => statuses.Contains(x.MainProduct!.Status));
     }
+
     public static IQueryable<ProductGroup> ApplyDiscountedProductsFilter(this IQueryable<ProductGroup> query, bool discountedProductsOnly)
     {
-        if(!discountedProductsOnly)
+        if (!discountedProductsOnly)
             return query;
 
         return query.Where(x => x.Products.Any(p => p.HasDiscount));
     }
     public static IQueryable<ProductGroup> ApplyMaxPriceFilter(this IQueryable<ProductGroup> query, int? maxPrice)
     {
-        if(maxPrice.HasValue && maxPrice > 0)
+        if (maxPrice.HasValue && maxPrice > 0)
         {
-            var parsedMaxPrice =  Money.Create(maxPrice.Value);
+            var parsedMaxPrice = Money.Create(maxPrice.Value);
             return query.Where(g => g.MainProduct!.CurrentPrice <= parsedMaxPrice);
         }
         return query;
     }
     public static IQueryable<ProductGroup> ApplyRatingFilter(this IQueryable<ProductGroup> query, bool onlyGoodRated)
     {
-        if(!onlyGoodRated)
+        if (!onlyGoodRated)
             return query;
 
-        var goodRating =  ProductAverageRating.From(3).Value;
+        var goodRating = ProductAverageRating.From(3).Value;
         return query.Where(x => x.AverageRating > goodRating);
     }
 
-    public static IQueryable<ProductGroup> GetPubishedProductGroups(this IQueryable<ProductGroup> query)
+    public static IQueryable<ProductGroup> ApplyFilterByPublishedProducts(this IQueryable<ProductGroup> query)
     {
         return query.Where(x => x.Status == ProductGroupState.Published && x.MainProductId != null);
     }
@@ -180,10 +175,10 @@ internal static class QueryableExtensions
     public static async Task<Result<List<CategoryListItem>>> ListCategoriesAsync(this IQueryable<Category> query, DbSet<Category> db, CancellationToken ct)
     {
         var q = query.AsNoTracking()
-                                .Where(x => x.ParentCategoryId == null)
-                                .Select(x =>
-                                new CategoryListItem(x.Id.ToString(), x.Name)
-                                );
+                     .Where(x => x.ParentCategoryId == null)
+                     .Select(x =>
+                     new CategoryListItem(x.Id.ToString(), x.Name)
+                     );
 
         var categories = await q.ToListAsync(ct);
 

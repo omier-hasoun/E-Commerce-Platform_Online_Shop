@@ -33,7 +33,6 @@ public static class DependencyInjection
            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-
         return services;
     }
 

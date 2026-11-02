@@ -1,6 +1,7 @@
 
 import {CategoryListItem  } from "../models/category-list-item.js";
 
+
 export class CategoryClient
 {
     constructor() {

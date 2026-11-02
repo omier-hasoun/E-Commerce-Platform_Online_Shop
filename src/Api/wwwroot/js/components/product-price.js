@@ -1,48 +1,79 @@
 class ProductPrice extends HTMLElement
 {
-    /** @type {HTMLSpanElement} */
-    discountPercentageElm;
+
+    #hasDiscount = false;
+    #originalPrice;
+    #discountPrice;
+    #discountPercent;
+    #renderDiscountPercent;
+
+    /**
+     * @type {boolean}
+     */
+    set renderDiscountPercent(value){
+        this.#renderDiscountPercent = value;
+        this.setAttribute("render-discount-percent", this.#renderDiscountPercent);//will automatically rerender
+    }
+
+    static get observedAttributes() {
+        return [
+
+            'hasdiscount',
+            'original-price',
+            'discount-price',
+            'discount-percent',
+            'render-discount-percent'
+        ];
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+
+        if(oldValue === newValue)
+            return;
+
+        this.#readAttributes();
+
+        this.#render();
+    }
+
+
     connectedCallback()
     {
-        this.innerHTML = `${this.createPrice()}`;
-        this.discountPercentageElm = this.querySelector('#discountPercentage');
-
-        if(this.discountPercentageElm)
-            this.discountPercentageElm.hidden = true;
+        this.#render();
 
     }
 
-    createPrice() {
+    #createElm() {
 
-        const hasDiscount = this.getAttribute('hasdiscount') === 'true';
-        const originalPrice = this.getAttribute('originalprice') ?? 0;
-
-        if (hasDiscount === false)
+        if (this.#hasDiscount === false)
         {
             return `
-                <p class="price">$${originalPrice}</p>
+                <p class="price">$${this.#originalPrice}</p>
             `;
         }
 
-        const discountPrice = this.getAttribute('discountprice') ?? 0;
-        const discountPercentage = this.getAttribute('discountpercentage') ?? 0;
-
         return `
-                <span id="discountPercentage" class="discount-percentage">${discountPercentage}% OFF</span>
-                <del class="original-price">$${originalPrice}</del>
-                <ins class="discount-price">$${discountPrice}</ins>
+                <span id="discountPercent" class="discount-percentage" hidden="${this.#renderDiscountPercent}">${this.#discountPercent}% OFF</span>
+                <del class="original-price">$${this.#originalPrice}</del>
+                <ins class="discount-price">$${this.#discountPrice}</ins>
             `;
+    }
 
+    #readAttributes()
+    {
+        this.#discountPercent = this.getAttribute("discount-percent") || 0;
+        this.#discountPrice = this.getAttribute("discount-price") || 0;
+        this.#originalPrice = this.getAttribute("original-price") || 0;
+        this.#hasDiscount = this.getAttribute("hasdiscount") === "true";
+        this.#renderDiscountPercent = this.getAttribute("render-discount-percent") === "true";
 
     }
 
-    showDiscountPercentage(){
-        this.discountPercentageElm.hidden = false;
 
-    }
+   #render(){
+        this.#readAttributes();
 
-   render(){
-    this.connectedCallback();
+        this.innerHTML = `${this.#createElm()}`;
    }
 
 }

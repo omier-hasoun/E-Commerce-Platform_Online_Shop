@@ -100,7 +100,6 @@ a:focus-visible {
   border-color: var(--accent);
 }
 
-/* "Remember me" and "Forgot password?" line */
 .row {
   display: flex;
   justify-content: space-between;

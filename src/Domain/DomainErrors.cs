@@ -150,7 +150,7 @@ public static class DomainErrors
 
         public static readonly Error ConnotPublishArchivedProduct = Error.Validation($"{BaseErrorCode}.{nameof(ConnotPublishArchivedProduct)}");
 
-        public static readonly Error rename100 = Error.Validation($"{BaseErrorCode}.{nameof(rename100)}");
+        public static readonly Error InventoryRequired = Error.Validation($"{BaseErrorCode}.{nameof(InventoryRequired)}");
 
         public static readonly Error UpdateNotAllowedOnArchivedProducts = Error.Validation($"{BaseErrorCode}.{nameof(UpdateNotAllowedOnArchivedProducts)}");
 
@@ -199,7 +199,7 @@ public static class DomainErrors
 
         public static readonly Error ProductPriceNotApplicableForDiscount = Error.Validation($"{BaseErrorCode}.{nameof(ProductPriceNotApplicableForDiscount)}");
 
-        public static readonly Error rename10 = Error.Validation($"{BaseErrorCode}.{nameof(rename10)}");
+        public static readonly Error ImagesRequired = Error.Validation($"{BaseErrorCode}.{nameof(ImagesRequired)}");
 
         public static readonly Error rename8 = Error.Validation($"{BaseErrorCode}.{nameof(rename8)}");
 

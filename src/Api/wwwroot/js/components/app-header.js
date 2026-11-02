@@ -46,12 +46,15 @@ class AppHeader extends HTMLElement
         this.#searchBtn.addEventListener("click", (e) => {
             e.preventDefault();
 
+            this.#searchBtn.disabled = true;
+
             this.dispatchEvent(new CustomEvent("querysubmit", {
                bubbles: true,
                 detail: {
                     text : this.#searchInput.value
                 }
             }));
+
         })
 
         this.#loginLink.addEventListener("click", (e) => {

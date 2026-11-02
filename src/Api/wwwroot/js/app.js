@@ -1,8 +1,8 @@
 ﻿
 import '/js/components/app-footer.js';
 import '/js/components/app-header.js';
-import '/js/components/brand-selector.js';
-import '/js/components/category-selector.js';
+import '/js/components/drop-down-list.js';
+
 
 import { Router } from './core/router.js';
 
@@ -27,6 +27,8 @@ async function initializePage() {
     document.querySelector("app-header").setSearchInput(text);
     await router.loadCurrentPage();
 }
+
+
 
 window.addEventListener("DOMContentLoaded", async () => await initializePage());
 

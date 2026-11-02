@@ -2,6 +2,7 @@
 @import "../components/app-paginator.css";
 @import "../components/product-price.css";
 @import "../components/app-dialog.css";
+@import "../components/drop-down-list.css";
 
 
 #productsContainer {
@@ -61,9 +62,10 @@
 
 }
 
-.brand-selector,
-.category-selector,
+
+drop-down-list,
 #maxPriceInput{
+
     width: 150px;
     height: 25px;
 }

@@ -21,12 +21,12 @@ internal sealed class BrandConfig : BaseEntityConfig<Brand>
 
         builder.Property(x => x.CompanyName)
                .HasColumnType("NVARCHAR")
-               .HasMaxLength(BrandRules.MaxCompanyNameLength)
+               .HasMaxLength(BrandRules.MaxCompanyNameLength * 2)
                .IsRequired();
 
         builder.Property(x => x.Name)
                .HasColumnType("NVARCHAR")
-               .HasMaxLength(BrandRules.MaxNameLength)
+               .HasMaxLength(BrandRules.MaxNameLength * 2)
                .IsRequired();
 
         builder.Property(x => x.Slug)
@@ -36,7 +36,7 @@ internal sealed class BrandConfig : BaseEntityConfig<Brand>
 
         builder.Property(x => x.Description)
                .HasColumnType("NVARCHAR")
-               .HasMaxLength(BrandRules.MaxDescriptionLength)
+               .HasMaxLength(BrandRules.MaxDescriptionLength * 2)
                .IsRequired();
 
         builder.Property(x => x.LogoUrl)

@@ -1,0 +1,11 @@
+.drop-down-list-default{
+    width:100%;
+    height: 100%;
+
+    max-width: 200px;
+    max-height: 50px;
+}
+drop-down-list{
+    width:100px;
+    height:30px;
+}

@@ -31,25 +31,25 @@ internal sealed class ProductGroupsConfig : BaseEntityConfig<ProductGroup>
 
         builder.Property(x => x.Title)
                .HasColumnType("NVARCHAR")
-               .HasMaxLength(ProductGroupRules.MaxTitleLength)
+               .HasMaxLength(ProductGroupRules.MaxTitleLength * 2)
                .IsRequired();
 
         builder.Property(x => x.NormalizedTitle)
                .HasColumnType("NVARCHAR")
-               .HasMaxLength(ProductGroupRules.MaxTitleLength)
+               .HasMaxLength(ProductGroupRules.MaxTitleLength * 2)
                .IsRequired();
 
         builder.Property(x => x.BrandName)
-               .HasColumnType("VARCHAR(100)")
+               .HasColumnType("NVARCHAR(100)")
                .IsRequired();
 
         builder.Property(x => x.CategoryName)
-               .HasColumnType("VARCHAR(100)")
+               .HasColumnType("NVARCHAR(100)")
                .IsRequired();
 
         builder.Property(x => x.Description)
                .HasColumnType("NVARCHAR")
-               .HasMaxLength(ProductGroupRules.MaxDescriptionLength)
+               .HasMaxLength(ProductGroupRules.MaxDescriptionLength * 2)
                .IsRequired();
 
         builder.Property(x => x.AverageRating)

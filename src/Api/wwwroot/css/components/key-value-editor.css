@@ -1,0 +1,43 @@
+
+.key-value-editor{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-width: fit-content;
+
+    margin: 0 auto;
+    padding: 0.5rem;
+}
+
+
+.key-value-row{
+    display:flex;
+    gap: 10px;;
+}
+
+.remove-key-value{
+    border: 0px;
+    cursor:pointer;
+
+}
+
+.add-key-value{
+    border: 2px solid #000;
+    cursor:pointer;
+    width: 50px;
+    height: 30px;
+    margin-top:10px;
+    align-self: flex-end;
+}
+
+
+.key-value-row input{
+    padding: 3px;
+
+}
+
+.key-value-inputs{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}

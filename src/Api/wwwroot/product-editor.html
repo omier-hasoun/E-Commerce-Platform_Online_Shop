@@ -1,80 +1,225 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>hello</title>
+        <link rel="stylesheet" href="/css/layout.css" />
+        <link rel="stylesheet" href="/css/shared.css" />
+        <link
+            data-page-css
+            rel="stylesheet"
+            href="/css/pages/product-editor.css"
+        />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hello</title>
-    <link rel="stylesheet" href="/css/layout.css">
-    <link rel="stylesheet" href="/css/shared.css">
-    <link data-page-css rel="stylesheet" href="/css/pages/product-editor.css">
+        <script type="module" src="/js/app.js"></script>
+    </head>
+    <body data-page="product-editor">
+        <app-header></app-header>
 
-    <script type="module" src="/js/app.js"></script>
-</head>
-<body data-page="product-editor">
-    <app-header></app-header>
+        <div id="sidebar"></div>
 
-    <div id="sidebar">
-    </div>
+        <main id="content">
+            <div id="productEditorPage" class="product-editor">
+                <form id="productEditorForm">
+                    <fieldset>
+                        <legend>Product Information</legend>
 
-    <main id="content">
-        <form action="">
+                        <div class="data-input">
+                            <label for="imagesEditor">Product Images</label>
+                            <images-editor
+                                id="imagesEditor"
+                                type="file"
+                                name="images"
+                                multiple
+                                accept="image/png, image/gif, image/jpeg, image/webp, image/bmp, image/tiff, image/avif"
+                                max-images="10"
+                            >
+                            </images-editor>
+                        </div>
 
-            <fieldset>
-                <legend>Product Information</legend>
+                        <div class="data-input">
+                            <label for="titleInput">Title*</label>
+                            <textarea
+                                id="titleInput"
+                                name="title"
+                                rows="2"
+                                cols="100"
+                                maxlength="60"
+                                required
+                                placeholder="Smartphone 400Gb"
+                            ></textarea>
+                        </div>
 
-                <div class="data-input">
-                    <label for="FileInput">Product Images</label>
-                    <input id="FileInput" type="file" name="images" multiple
-                        accept="image/png, image/gif, image/jpeg, image/webp, image/bmp, image/tiff, image/avif">
-                </div>
+                        <div class="data-input">
+                            <label for="descriptionInput">Description*</label>
+                            <textarea
+                                id="descriptionInput"
+                                name="description"
+                                rows="10"
+                                cols="100"
+                                maxlength="500"
+                                required
+                                placeholder="phone for photos and gaming"
+                            ></textarea>
+                        </div>
 
-                <div class="data-input">
-                    <label for="titleInput">Title</label>
-                    <input type="text" name="title" id="titleInput">
-                </div>
+                        <div class="row">
+                            <div class="data-input">
+                                <label for="isSerialized"
+                                    >Serialized:</label
+                                >
+                                <input
+                                    id="isSerialized"
+                                    name="isSerialized"
+                                    type="checkbox"
+                                    checked="false"
+                                />
+                            </div>
+                        </div>
 
-                <div class="data-input">
-                    <label for="descriptionInput">Description</label>
-                    <input type="text" name="description" id="descriptionInput">
-                </div>
+                        <div class="row">
+                            <div class="data-input">
+                                <label for="categorySelector">Category*</label>
+                                <drop-down-list
+                                    id="categorySelector"
+                                    name="categoryId"
+                                    required
+                                    placeholder="Select a category"
+                                ></drop-down-list>
+                            </div>
+                        </div>
 
-                <div class="data-input">
-                    <label for="categoryInput">Category</label>
-                    <category-selector name="category" id="categoryInput"></category-selector>
-                </div>
+                        <div class="row">
+                            <div class="data-input">
+                                <label for="brandSelector">Brand*</label>
+                                <drop-down-list
+                                    id="brandSelector"
+                                    name="brandId"
+                                    required
+                                    placeholder="Select a brand"
+                                ></drop-down-list>
+                            </div>
+                        </div>
 
-                <div class="data-input">
-                    <label for="brandInput">Brand</label>
-                    <brand-selector name="brand" id="brandInput"></brand-selector>
-                </div>
-            </fieldset>
+                        <div class="row">
+                            <div class="data-input">
+                                <label for="priceInput">Price*</label>
+                                <input
+                                    type="number"
+                                    name="price"
+                                    id="priceInput"
+                                    placeholder="420.99 $"
+                                    step="0.01"
+                                />
+                            </div>
 
-            <fieldset>
-                <legend>Product Dimensions & Weight (cm, gram)</legend>
+                            <div class="data-input">
+                                <label for="stockQuantity"
+                                    >Stock quantity:</label
+                                >
+                                <input
+                                    id="stockQuantity"
+                                    name="Inventory.StockQuantity"
+                                    type="number"
+                                    value="0"
+                                />
+                            </div>
+                        </div>
 
-                <div class="data-input">
-                    <label for="widthInput">Width</label>
-                    <input type="number" name="width" id="widthInput" placeholder="20 cm">
-                </div>
+                        <div class="row">
+                            <div class="data-input">
+                                <label for="skuInput">SKU*:</label>
+                                <input
+                                    id="skuInput"
+                                    name="sku"
+                                    type="text"
+                                    maxlength="20"
+                                />
+                            </div>
+                            <div class="data-input">
+                                <label for="barCodeInput">Barcode*:</label>
+                                <input
+                                    id="barCodeInput"
+                                    name="barCode"
+                                    type="text"
+                                    maxlength="20"
+                                />
+                            </div>
+                            <div class="data-input">
+                                <label for="slugInput">Slug*:</label>
+                                <input
+                                    id="slugInput"
+                                    name="slug"
+                                    type="text"
+                                    maxlength="30"
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Product Dimensions & Weight (cm, gram)</legend>
+                        <div class="row">
+                            <div class="data-input">
+                                <label for="widthInput">Width*</label>
+                                <input
+                                    type="number"
+                                    name="width"
+                                    id="widthInput"
+                                    placeholder="20 cm"
+                                    step="1"
+                                />
+                            </div>
 
-                <div class="data-input">
-                    <label for="heightInput">Height</label>
-                    <input type="number" name="height" id="heightInput" placeholder="30 cm">
-                </div>
+                            <div class="data-input">
+                                <label for="heightInput">Height*</label>
+                                <input
+                                    type="number"
+                                    name="height"
+                                    id="heightInput"
+                                    placeholder="30 cm"
+                                    step="1"
+                                />
+                            </div>
 
-                <div class="data-input">
-                    <label for="lengthInput">Length</label>
-                    <input type="number" name="length" id="lengthInput" placeholder="5 cm">
-                </div>
-
-                <div class="data-input">
-                    <label for="weightInput">Weight</label>
-                    <input type="number" name="weight" id="weightInput" placeholder="700 gram">
-                </div>
-            </fieldset>
-        </form>
-    </main>
-    <app-footer></app-footer>
-</body>
+                            <div class="data-input">
+                                <label for="lengthInput">Length*</label>
+                                <input
+                                    type="number"
+                                    name="length"
+                                    id="lengthInput"
+                                    placeholder="5 cm"
+                                    step="1"
+                                />
+                            </div>
+                            <div class="data-input">
+                                <label for="weightInput">Weight*</label>
+                                <input
+                                    type="number"
+                                    name="weight"
+                                    id="weightInput"
+                                    placeholder="700 gram"
+                                    step="1"
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Specifications</legend>
+                        <key-value-editor id="keyValueEditor"></key-value-editor>
+                    </fieldset>
+                    <div class="product-editor-buttons">
+                        <button
+                            id="submitFormBtn"
+                            type="submit"
+                            class="rounded-btn"
+                        >
+                            Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <app-footer></app-footer>
+    </body>
 </html>

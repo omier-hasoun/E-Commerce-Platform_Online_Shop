@@ -28,7 +28,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         LastModifiedBy = lastModifiedBy;
     }
     public static Result<ProductGroup> Create(ProductGroupId id, BrandId brandId, string brandName, CategoryId categoryId, string categoryName, string title, string description,
-        bool isSerialized, Dictionary<string, string> specifications)
+        bool isSerialized, Dictionary<string, string>? specifications)
     {
         // Add domain validation logic here
         var validationResult = Result.ValidateAll(
@@ -107,45 +107,39 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
     private bool CanModify() => Status != ProductGroupState.Archived;
 
 
-    public Result<Updated> Update(BrandId? brandId, string? brandName, CategoryId? categoryId, string? categoryName, string? title, string? description,
-        bool? isSerialized, Dictionary<string, string>? specifications)
+    public Result<Updated> Update(BrandId brandId, string brandName, CategoryId categoryId, string categoryName, string title, string description,
+        bool isSerialized, Dictionary<string, string>? specifications,
+        Money originalPrice, int width, int height, int length,
+        int weight, string sku, string slug, string barCode)
     {
         if (!CanModify())
             return DomainErrors.Locked;
 
         List<Error> errors = new(7);
 
-        if (brandId != null && brandName != null)
+        if (Status != ProductGroupState.Draft)
+            errors.Add(DomainErrors.Products.CannotChangeBrandAfterPublish);
+        else
         {
-            if (Status != ProductGroupState.Draft)
-                errors.Add(DomainErrors.Products.CannotChangeBrandAfterPublish);
-            else
+            var res = brandId.IsValid();
+            if (res.Failed)
             {
-                var res = brandId.Value.IsValid();
-                if (res.Failed)
-                {
-                    errors.Add(res.TopError);
-                }
+                errors.Add(res.TopError);
             }
-
         }
 
-        if (categoryId != null && categoryName != null)
+        if (Status != ProductGroupState.Draft)
+            errors.Add(DomainErrors.Products.CannotChangeCategoryAfterPublish);
+        else
         {
-            if (Status != ProductGroupState.Draft)
-                errors.Add(DomainErrors.Products.CannotChangeCategoryAfterPublish);
-            else
+            var res = categoryId.IsValid();
+            if (res.Failed)
             {
-                var res = categoryId.Value.IsValid();
-                if (res.Failed)
-                {
-                    errors.Add(res.TopError);
-                }
+                errors.Add(res.TopError);
             }
-
         }
 
-        if (title != null)
+
         {
             var res = ValidateTitle(title);
 
@@ -153,7 +147,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
                 errors.Add(res.TopError);
         }
 
-        if (description != null)
+
         {
             var res = ValidateDesciption(description);
 
@@ -161,14 +155,12 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
                 errors.Add(res.TopError);
         }
 
-        if (isSerialized != null)
         {
-            if (Status != ProductGroupState.Draft)
-                errors.Add(DomainErrors.Products.CannotUpdateIsSerializedAfterPublish);
 
+            if (isSerialized != IsSerialized && Status != ProductGroupState.Draft)
+                errors.Add(DomainErrors.Products.CannotUpdateIsSerializedAfterPublish);
         }
 
-        if (specifications != null)
         {
             var res = ValidateSpecifications(specifications);
 
@@ -176,22 +168,28 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
                 errors.Add(res.TopError);
         }
 
+
         if (errors.Count > 0)
             return errors;
 
-        _specifications = specifications ?? _specifications;
+        var result = MainProduct!.Update(originalPrice, width, height, length, weight, sku, slug, barCode);
 
-        IsSerialized = isSerialized ?? IsSerialized;
+        if (result.Failed)
+            return result.Errors;
 
-        Description = description ?? Description;
+        _specifications = specifications;
 
-        Title = title ?? Title;
+        IsSerialized = isSerialized;
 
-        CategoryId = categoryId ?? CategoryId;
-        CategoryName = categoryName ?? CategoryName;
+        Description = description;
 
-        BrandId = brandId ?? BrandId;
-        BrandName = brandName ?? BrandName;
+        Title = title;
+
+        CategoryId = categoryId;
+        CategoryName = categoryName;
+
+        BrandId = brandId;
+        BrandName = brandName;
 
         return Result.Updated;
     }
@@ -221,7 +219,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
     }
 
     public Result<Success> AddProduct(ProductId productId, Money price, int width, int height,
-        int length, int weight, string sku, string slug, string barCode, Dictionary<string, string> specifications)
+        int length, int weight, string sku, string slug, string barCode, Dictionary<string, string>? variantSpecifications = null)
     {
         if (!CanModify())
             return DomainErrors.Locked;
@@ -231,7 +229,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
             return DomainErrors.Products.MaxNumberOfVariantsReached;
         }
 
-        var createVariantResult = Product.Create(productId, Id, price, width, height, length, weight, sku, slug, barCode, specifications);
+        var createVariantResult = Product.Create(productId, Id, price, width, height, length, weight, sku, slug, barCode, variantSpecifications);
 
         if (createVariantResult.Failed)
         {
@@ -253,7 +251,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
     }
 
 
-    public Result<Updated> AddProductImages(ProductId productId, List<string> fileNames)
+    public Result<Updated> UpdateImages(ProductId productId, List<ProductImage> images)
     {
         if (!CanModify())
             return DomainErrors.Locked;
@@ -263,7 +261,7 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         if (product is null)
             return DomainErrors.ProductIdInvalid;
 
-        return product.AddImages(fileNames);
+        return product.UpdateImages(images);
     }
 
     public Result<Deleted> RemoveProductImages(ProductId productId, List<string> fileNames)
@@ -430,11 +428,31 @@ public sealed class ProductGroup : AggregateRoot<ProductGroupId>, IFullAudited
         return Result.Success;
     }
 
-    internal static Result<Success> ValidateSpecifications(Dictionary<string, string> specifications)
+    internal static Result<Success> ValidateSpecifications(Dictionary<string, string>? specifications)
     {
         if (specifications is null || specifications.Count == 0)
         {
-            return DomainErrors.Products.SpecificationsInvalid;
+            return Result.Success;
+        }
+
+        if (specifications.Count > ProductRules.MaxNumberOfSpecifications)
+        {
+            return DomainErrors.Products.MaxAllowedSpecificationsNumberExceeded;
+        }
+
+        foreach (var spec in specifications)
+        {
+            bool invalidKey =
+            string.IsNullOrEmpty(spec.Key) || ValHelper.IsOutOfRange(spec.Key.Length, ProductRules.MinSpecificationKeyLength, ProductRules.MaxSpecificationKeyLength);
+
+            bool invalidValue = string.IsNullOrEmpty(spec.Value) ||
+            ValHelper.IsOutOfRange(spec.Value.Length, ProductRules.MinSpecificationValueLength, ProductRules.MaxSpecificationValueLength);
+
+
+            if (invalidKey & invalidValue)
+            {
+                return DomainErrors.Products.InvalidSpecification;
+            }
         }
 
         return Result.Success;

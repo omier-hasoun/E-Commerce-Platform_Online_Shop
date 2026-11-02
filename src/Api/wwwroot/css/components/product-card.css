@@ -7,9 +7,7 @@
     gap:7pt;
     background-color: transparent;
 }
-.product-card:hover {
-    cursor:pointer;
-}
+
 .product-card img {
     object-fit: contain;
     border-radius: 3px;

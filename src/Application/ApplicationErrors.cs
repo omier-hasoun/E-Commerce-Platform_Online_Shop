@@ -66,11 +66,11 @@ public static class ApplicationErrors
 
         public static readonly Error RoleInvalid = Error.Validation($"{BaseErrorCode}.{nameof(RoleInvalid)}");
 
-        public static readonly Error rename4 = Error.Validation($"{BaseErrorCode}.{nameof(rename4)}");
+        public static readonly Error SearchTermRequired = Error.Validation($"{BaseErrorCode}.{nameof(SearchTermRequired)}");
 
         public static readonly Error YouCannotHaveMoreThanOneWarehouse = Error.Validation($"{BaseErrorCode}.{nameof(YouCannotHaveMoreThanOneWarehouse)}");
 
-        public static readonly Error rename6 = Error.Validation($"{BaseErrorCode}.{nameof(rename6)}");
+        public static readonly Error StatusInvalid = Error.Validation($"{BaseErrorCode}.{nameof(StatusInvalid)}");
 
         public static readonly Error rename7 = Error.Validation($"{BaseErrorCode}.{nameof(rename7)}");
 

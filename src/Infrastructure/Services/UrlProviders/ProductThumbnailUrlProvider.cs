@@ -38,7 +38,7 @@ internal sealed class ProductThumbnailUrlProvider : IProductThumbnailUrlProvider
 
         var path = GetSizePath(size);
 
-        return $"{path}/{imageName}";
+        return $"/{path}/{imageName}";
     }
     public string GetAbsoluteUrl(string imageName, ProductThumbnailSize size)
     {

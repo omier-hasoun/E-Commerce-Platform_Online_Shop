@@ -9,11 +9,11 @@ public sealed class Product : BaseEntity<ProductId>
     {
     }
 
-    private Product(ProductId id, ProductGroupId productsGroupId, Money? discountPrice, Money originalPrice, Money currentPrice, byte? discountPercentage, DateOnly? discountExpiresOn, ProductState status,
+    private Product(ProductId id, ProductGroupId productGroupId, Money? discountPrice, Money originalPrice, Money currentPrice, byte? discountPercentage, DateOnly? discountExpiresOn, ProductState status,
         int width, int height, int length, int weight, string sku, string slug, string barCode, Dictionary<string, string> variantSpecifications, List<ProductImage> images)
         : base(id)
     {
-        ProductGroupId = productsGroupId;
+        ProductGroupId = productGroupId;
 
         DiscountPrice = discountPrice;
         DiscountPercentage = discountPercentage;
@@ -33,8 +33,8 @@ public sealed class Product : BaseEntity<ProductId>
         _variantSpecifications = variantSpecifications;
     }
 
-    public static Result<Product> Create(ProductId id, ProductGroupId productsGroupId, Money originalPrice, int width, int height, int length,
-        int weight, string sku, string slug, string barCode, Dictionary<string, string> variantSpecifications, List<ProductImage>? images = null)
+    public static Result<Product> Create(ProductId id, ProductGroupId productGroupId, Money originalPrice, int width, int height, int length,
+        int weight, string sku, string slug, string barCode, Dictionary<string, string>? variantSpecifications, List<ProductImage>? images = null)
     {
         var validationResult = Result.ValidateAll(
                                 () => id.IsValid(),
@@ -60,8 +60,43 @@ public sealed class Product : BaseEntity<ProductId>
         ProductState status = ProductState.Draft;
         images ??= [];
 
-        return new Product(id, productsGroupId, priceBeforeDisount, originalPrice, currentPrice, discountPercentage, discountExpiresOn, status,
+        return new Product(id, productGroupId, priceBeforeDisount, originalPrice, currentPrice, discountPercentage, discountExpiresOn, status,
             width, height, length, weight, sku, slug, barCode, variantSpecifications, images);
+    }
+
+
+
+    public Result<Updated> Update(Money originalPrice, int width, int height, int length,
+        int weight, string sku, string slug, string barCode)
+    {
+        var validationResult = Result.ValidateAll(
+                        () => ValidatePrice(originalPrice),
+                        () => Validate_Width_Height_Length(width, height, length),
+                        () => ValidateSku(sku),
+                        () => ValidateSlug(slug),
+                        () => ValidateBarcode(barCode));
+
+        if (validationResult.Failed)
+        {
+            return validationResult.Errors;
+        }
+
+        Width = width;
+        Height = height;
+        Length = length;
+        Weight = weight;
+
+        Sku = sku;
+        Slug = slug;
+        BarCode = barCode;
+
+        OriginalPrice = originalPrice;
+
+        // recalculate if product is updated while it is in discount
+        if (HasDiscount)
+            ApplyDiscount(DiscountExpiresOn!.Value, DiscountPercentage!.Value);
+
+        return Result.Updated;
     }
 
     public ProductGroupId ProductGroupId { get; private init; }
@@ -89,7 +124,7 @@ public sealed class Product : BaseEntity<ProductId>
 
     public string Slug { get; private set; } = null!;
 
-    public string BarCode { get; private init; } = null!;
+    public string BarCode { get; private set; } = null!;
 
     public Inventory Inventory { get; private set; }
 
@@ -117,25 +152,20 @@ public sealed class Product : BaseEntity<ProductId>
     private Dictionary<string, string> _variantSpecifications = [];
     public IReadOnlyDictionary<string, string> VariantSpecifications { get { return _variantSpecifications.AsReadOnly(); } private set { _variantSpecifications = value is null ? [] : value.ToDictionary(); } }
 
-    public Result<Updated> AddImages(List<string> fileNames)
+    public Result<Updated> UpdateImages(List<ProductImage> images)
     {
         if (!CanModify())
             return DomainErrors.Locked;
 
-        if (fileNames is null || fileNames.Count == 0)
-            return DomainErrors.MissingInput;
+        if (images is null || images.Count == 0)
+            return DomainErrors.Products.ImagesRequired;
 
-        int totalImagesCount = fileNames.Count + _images.Count;
-
-        if (totalImagesCount > ProductRules.MaxNumberOfImages)
+        if (images.Count > ProductRules.MaxNumberOfImages)
             return DomainErrors.Products.ImagesLimitExceeded.WithParameters(ProductRules.MaxNumberOfImages);
 
-        byte sortOrder = (byte)(_images.Count + 1);
+        this.Images = images;
 
-        for (int i = 0; sortOrder <= totalImagesCount; i++)
-        {
-            _images.Add(ProductImage.Create(fileNames[i], sortOrder++));
-        }
+        SortImages();
 
         return Result.Updated;
     }
@@ -169,6 +199,7 @@ public sealed class Product : BaseEntity<ProductId>
 
             _images.Remove(image);
         }
+
         SortImages();
         return Result.Deleted;
     }
@@ -179,6 +210,11 @@ public sealed class Product : BaseEntity<ProductId>
         {
             return DomainErrors.InvalidStateTransition;
         }
+        if (Inventory == null)
+        {
+            return DomainErrors.Products.InventoryRequired;
+        }
+
         Status = ProductState.Published;
         return Result.Success;
     }
@@ -201,7 +237,7 @@ public sealed class Product : BaseEntity<ProductId>
         return Result.Success;
     }
 
-    private void SortImages()
+    private void  SortImages()
     {
         byte sortOrder = 1;
         List<ProductImage> sortedImages = new(_images.Count);
@@ -354,7 +390,7 @@ public sealed class Product : BaseEntity<ProductId>
     {
         if (specifications is null || specifications.Count == 0)
         {
-            return DomainErrors.Products.AtleastOneSpecificationRequired;
+            return Result.Success;
         }
 
         if (specifications.Count > ProductRules.MaxNumberOfSpecifications)

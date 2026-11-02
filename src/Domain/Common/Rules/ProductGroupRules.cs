@@ -8,7 +8,7 @@ public static class ProductGroupRules
 
     // Description length limits
     public const short MinDescriptionLength = 5;
-    public const short MaxDescriptionLength = 1000;
+    public const short MaxDescriptionLength = 2000;
 
     // ProductGroup product count limits
     public const byte MinNumberOfVariants = 1;

@@ -4,70 +4,75 @@ import '/js/components/product-price.js';
 
 
 import { ProductClient } from "../core/client/product-client.js";
-import { ProductGroup } from '../core/models/product-group.js';
 import { LoadingIndicator } from '../core/loading-indicator.js';
+import { Product } from '../core/models/product.js';
+import { Router } from '../core/router.js';
 
 
 
 const client = new ProductClient();
+let product = new Product();
+let router = new Router();
 export async function init()
 {
-
-    loadProduct(await getProduct());
+    product = await loadProduct();
+    render();
+    updateUrlToDisplaySlug();
 }
 
-async function getProduct(){
+async function loadProduct(){
     LoadingIndicator.show(document.getElementById('content'))
     const path = window.location.pathname;
-    const match = path.match(/^\/products\/(\d+)$/);
+    const match = path.match(/^\/products\/(\d+)/);
     const product = await client.getProduct(match[1]);
     return product;
 }
-/**
- *
- * @param {ProductGroup} productGroup
- */
-function loadProduct(productGroup){
-    console.log('product with id ' + productGroup.requestedProductId + ' was loaded successfully.');
+
+function updateUrlToDisplaySlug()
+{
+    let url = window.location.pathname + "/" + product.slug + window.location.search;
+    router.replaceState(url);
+}
+
+function render(){
     LoadingIndicator.hide();
+
+    console.log('product with id ' + product.id + ' was loaded successfully.');
     const titleElm = document.getElementById('productTitle');
     const descriptionElm = document.getElementById('productDescription');
-    // const categoryElm = document.getElementById('productCategory');
 
     const specificationsElm = document.getElementById('productSpecifications');
-    // const variantSpecificaitonsElm = document.getElementById('productVariantSpecificaitons');
+
     const addtocartBtn = document.getElementById('addtocartBtn');
 
 
     const galleryElm = document.getElementById('productGallery');
-    galleryElm.images = productGroup.requestedProduct.images;
+    galleryElm.images = product.images;
 
 
     const ratingElm = document.getElementById('productRating');
     const priceElm = document.getElementById('productPrice');
     const stockElm = document.getElementById('productStock');
 
-    priceElm.setAttribute('discountPercentage', productGroup.requestedProduct.discountPercentage);
-    priceElm.setAttribute('discountPrice', productGroup.requestedProduct.discountPrice);
-    priceElm.setAttribute('originalPrice', productGroup.requestedProduct.originalPrice);
-    priceElm.setAttribute('hasDiscount', productGroup.requestedProduct.hasDiscount);
+    priceElm.setAttribute('discount-percent', product.discountPercent);
+    priceElm.setAttribute('discount-price', product.discountPrice);
+    priceElm.setAttribute('original-price', product.originalPrice);
+    priceElm.setAttribute('hasdiscount', product.hasDiscount);
 
-    priceElm.render();
+    titleElm.textContent = product.brand + " " + product.title;
 
-    titleElm.textContent = productGroup.brand + " " + productGroup.title;
+    descriptionElm.innerHTML = product.description;
 
-    descriptionElm.innerHTML = productGroup.description;
+    ratingElm.innerText = product.rating + " ⭐";
+    stockElm.textContent = product.inStock ? "In stock" : "currently unavailable";
+    stockElm.style.color = product.inStock ? "green" : "red";
+    addtocartBtn.hidden = !product.inStock;
 
-    ratingElm.innerText = productGroup.rating + " ⭐";
-    stockElm.textContent = productGroup.requestedProduct.inStock ? "In stock" : "currently unavailable";
-    stockElm.style.color = productGroup.requestedProduct.inStock ? "green" : "red";
-    addtocartBtn.hidden = !productGroup.requestedProduct.inStock;
-
-    if(productGroup.specifications.size === 0)
+    if(product.specifications.size === 0)
         specificationsElm.remove();
     else{
 
-        productGroup.specifications.forEach((value, key) => {
+        product.specifications.forEach((value, key) => {
             specificationsElm.appendChild(renderSpecification(key, value));
         });
     }

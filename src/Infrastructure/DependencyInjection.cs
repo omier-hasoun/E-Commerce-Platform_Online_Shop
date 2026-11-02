@@ -152,6 +152,9 @@ public static class DependencyInjection
         services.AddKeyedSingleton<IPrimitiveTypeIdGenerator<Guid>, GuidV7Generator>("GuidV7");
         services.AddKeyedSingleton<IPrimitiveTypeIdGenerator<long>, SnowflakeGenerator>("Snowflake");
 
+        services.AddSingleton<App.IIdGenerator<long>, SnowflakeGenerator>();
+
+
         services.AddSingleton<App.IIdGenerator<ProductGroupId>, ProductGroupIdGenerator>();
 
         services.AddSingleton<App.IIdGenerator<ProductId>, ProductIdGenerator>();

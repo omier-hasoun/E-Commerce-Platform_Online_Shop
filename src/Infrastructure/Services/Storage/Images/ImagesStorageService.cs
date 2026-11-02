@@ -54,6 +54,7 @@ internal sealed class ImagesStorageService : IImageStorageService
             var filePath = Path.Combine(_originalImagesDirPath, image.InternalFileName);
             imageProcessJobs.Add(new ImageProcessingJob(filePath));
 
+            // if any image was failed to save, rollback by deleting all saved files and return an error
             if (await _fileStore.SaveAsync(image.ContentStream, filePath, ct) is false)
             {
                 if (imageProcessJobs.Count > 0)

@@ -11,10 +11,10 @@ public class Category : AggregateRoot<CategoryId>
 
     public static Result<Category> Create(CategoryId id, string name, CategoryId? parentCategoryId)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(name) || name.Length > CategoryRules.MaxCategoryNameLength)
             return DomainErrors.Categories.InvalidName;
 
-        return new Category(id, name, parentCategoryId);
+        return new Category(id, name.Trim(), parentCategoryId);
     }
 
     public CategoryId? ParentCategoryId { get; private set; }

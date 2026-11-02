@@ -233,7 +233,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
-                        .HasMaxLength(100)
+                        .HasMaxLength(200)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<DateTime>("CreatedAt")
@@ -241,7 +241,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(510)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<bool>("IsActive")
@@ -253,7 +253,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(100)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<string>("Slug")
@@ -349,8 +349,8 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<long?>("ParentCategoryId")
                         .HasColumnType("bigint");
@@ -698,14 +698,14 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("BrandName")
                         .IsRequired()
-                        .HasColumnType("VARCHAR(100)");
+                        .HasColumnType("NVARCHAR(100)");
 
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
-                        .HasColumnType("VARCHAR(100)");
+                        .HasColumnType("NVARCHAR(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -715,7 +715,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
+                        .HasMaxLength(4000)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<bool>("IsSerialized")
@@ -732,7 +732,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("NormalizedTitle")
                         .IsRequired()
-                        .HasMaxLength(60)
+                        .HasMaxLength(120)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<int>("Status")
@@ -740,7 +740,7 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(60)
+                        .HasMaxLength(120)
                         .HasColumnType("NVARCHAR");
 
                     b.Property<string>("_specifications")
@@ -1457,6 +1457,8 @@ namespace Infrastructure.Data.Migrations
 
                             b1.Property<string>("FileName")
                                 .IsRequired();
+
+                            b1.Property<long>("Id");
 
                             b1.Property<byte>("SortOrder");
 

@@ -3,61 +3,46 @@ using Domain.ProductGroups.Products;
 
 namespace Application.Features.Public.Products.Queries.GetProductById;
 
-internal sealed class GetProductByIdQueryHandler(IAppDbContext context, IProductThumbnailUrlProvider productThumbnailUrlProvider) : IRequestHandler<GetProductByIdQuery, Result<ProductGroupDto>>
+internal sealed class GetProductByIdQueryHandler(IAppDbContext context, IProductThumbnailUrlProvider productThumbnailUrlProvider) : IRequestHandler<GetProductByIdQuery, Result<ProductDto>>
 {
-    public async Task<Result<ProductGroupDto>> Handle(GetProductByIdQuery request, CancellationToken ct)
+    public async Task<Result<ProductDto>> Handle(GetProductByIdQuery request, CancellationToken ct)
     {
         var productId = request.ParsedProductId;
 
         var group = await context.ProductGroups
             .AsNoTracking()
-            .Include(pg => pg.Products)
+            .Where(pg => pg.MainProductId == productId && pg.MainProduct!.Status == ProductState.Published)
+            .Include(pg => pg.MainProduct)
                 .ThenInclude(p => p.Inventory)
-            .Where(pg => pg.MainProductId != null &&
-                        pg.Products.Any(p => p.Id == productId && p.Status == ProductState.Published))
             .FirstOrDefaultAsync(ct);
 
-            if (group is null)
-            {
-                return ApplicationErrors.NotFound.Product;
-            }
+        if (group is null)
+        {
+            return ApplicationErrors.NotFound.Product;
+        }
 
-        var productGroupDto = new ProductGroupDto(
-            productId,
-            group.MainProductId!,
+        return new ProductDto(
+            group.MainProduct!.Id,
             group.Title,
             group.Description,
             group.Specifications,
             group.BrandName,
             group.CategoryName,
             group.AverageRating,
-            group.Products.Select(p => {
+            group.MainProduct!.OriginalPrice,
+            group.MainProduct!.HasDiscount,
+            group.MainProduct.HasDiscount ? group.MainProduct.DiscountExpiresOn : null,
+            group.MainProduct!.DiscountPercentage,
+            group.MainProduct!.DiscountPrice,
+            group.MainProduct.Images?.Select(img =>
+            {
+                var image = productThumbnailUrlProvider.GetRelativeUrl(img.FileName, ProductThumbnailSize.Large);
+                return new ProductImageDto(img.Id, image, img.SortOrder);
+            }).ToList(),
+            group.MainProduct.Slug,
+            group.MainProduct.Inventory!.StockQuantity > 0,
+            group.MainProduct.Inventory!.StockQuantity,
+            group.IsSerialized);
 
-                List<ProductImageDto> images;
-                if(p.Images == null || p.Images.Count == 0)
-                {
-                    images = new (1) {  new ProductImageDto(productThumbnailUrlProvider.GetDefaultThumbnailUrl(ProductThumbnailSize.Medium), 1)};
-                }
-                else
-                {
-                    images = p.Images.Select(img => new ProductImageDto(
-                                        productThumbnailUrlProvider.GetRelativeUrl(img.FileName,
-                                        ProductThumbnailSize.Large), img.SortOrder)).ToList();
-                }
-
-                return new ProductDto(
-                p.Id,
-                p.OriginalPrice,
-                p.HasDiscount,
-                p.DiscountPercentage,
-                p.DiscountPrice,
-                images,
-                p.Slug,
-                p.VariantSpecifications,
-                p.Inventory != null && p.Inventory.StockQuantity > 0);
-            })
-        );
-
-        return productGroupDto;
     }
 }

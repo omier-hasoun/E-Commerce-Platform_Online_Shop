@@ -4,17 +4,19 @@ namespace Application.Common.Dtos;
 
 public sealed record ProductImageDto
 {
-    public string Image { get; init; } 
+    public long Id { get; init; }
+    public string Url { get; init; }
     public byte SortOrder { get; init; }
 
-    public ProductImageDto(string image, byte SortOrder)
+    public ProductImageDto(long id, string image, byte SortOrder)
     {
-        Image = image;
+        this.Id = id;
+        this.Url = image;
         this.SortOrder = SortOrder;
     }
 
 
-    internal ProductImageDto(ProductImage image) : this(image.FileName, image.SortOrder)
+    internal ProductImageDto(ProductImage image) : this(image.Id, image.FileName, image.SortOrder)
     {
 
     }
@@ -29,17 +31,6 @@ public sealed record ProductImageDto
         });
 
         return imagesDto;
-    }
-
-    public static List<ProductImage> ToProductImages(IReadOnlyCollection<ProductImageDto> imagesDto)
-    {
-        List<ProductImage> images = new(imagesDto.Count);
-
-        foreach (var item in imagesDto)
-        {
-            images.Add(ProductImage.Create(item.Image, item.SortOrder));
-        }
-        return images;
     }
 
 }

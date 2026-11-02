@@ -38,7 +38,6 @@ document.addEventListener("submit", async (e) => {
     }
 
 
-
     if(loggedIn)
     {
         const params = new URLSearchParams(location.search);

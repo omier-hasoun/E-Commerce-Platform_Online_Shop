@@ -4,6 +4,26 @@ export class Router {
 
     #loader = new PageLoader();
 
+    get url()
+    {
+        return window.location.href;
+    }
+
+    get pathname()
+    {
+        return window.location.pathname;
+    }
+
+    get searchParamsString()
+    {
+        return window.location.search;
+    }
+
+    get searchParamsObj()
+    {
+        return new URLSearchParams(window.location.search);
+    }
+
     constructor()
     {
 
@@ -13,8 +33,10 @@ export class Router {
  * @param {URL | string} url
  */
     replaceState(url){
+        const search = this.searchParamsString === "?null" ? "" : this.searchParamsString;
+
         const href = url instanceof URL ? url : new URL(url, window.location.origin);
-        href.search = href.search === "?null" ? "" : href.search;
+        href.search = search;
 
         history.replaceState(null, "", href);
     }
@@ -53,10 +75,10 @@ export class Router {
         await this.navigateToProducts(searchParams, false);
     }
 
-    else if (path.match(/^\/products\/(\d+)$/))
+    else if (path.match(/^\/products\/(\d+)/))
     {
         // productId
-        const match = path.match(/^\/products\/(\d+)$/);
+        const match = path.match(/^\/products\/(\d+)/);
         await this.navigateToProductView(match[1], searchParams, false);
     }
 
@@ -69,7 +91,7 @@ export class Router {
     {
         const match = path.match(/^\/products\/edit\/(\d+)$/);
 
-        await this.navigateToProductEditor("update", match[2], searchParams, false);
+        await this.navigateToProductEditor("update", match[1], searchParams, false);
     }
 
     else if (path === "/login")

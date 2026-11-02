@@ -14,6 +14,7 @@ class ProductGallery extends HTMLElement
         this.#prevBtnElm.disabled = this.#images.length <= 1;
 
         this.#setCurrentImage(0);
+        this.#render();
     }
     connectedCallback()
     {
@@ -40,10 +41,12 @@ class ProductGallery extends HTMLElement
     #attachEvents() {
         this.#prevBtnElm.addEventListener('click', () => {
             this.#setCurrentImage(this.#currentImageIndex - 1);
+            this.#render();
         });
 
         this.#nextBtnElm.addEventListener('click', () => {
             this.#setCurrentImage(this.#currentImageIndex + 1);
+            this.#render();
         });
     }
 
@@ -53,12 +56,10 @@ class ProductGallery extends HTMLElement
 
         this.#currentImageIndex = index > lastImageIndex ? 0 :
                                  index < 0 ? lastImageIndex : index;
-
-        this.#render();
     }
 
     #render(){
-        this.#imageViewerElm.setAttribute('src', `/${this.#images.at(this.#currentImageIndex).image}`);
+        this.#imageViewerElm.setAttribute('src', `/${this.#images.at(this.#currentImageIndex).url}`);
         this.#imageViewerElm.setAttribute('alt', this.getAttribute('alt') || 'product image');
         this.#currentImageIndexElm.textContent = `${this.#images[this.#currentImageIndex].sortOrder}/${this.#images.length}`;
     }

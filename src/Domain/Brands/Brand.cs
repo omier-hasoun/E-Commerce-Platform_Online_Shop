@@ -24,7 +24,10 @@ public sealed class Brand : AggregateRoot<BrandId>, IHasCreationTime
                                                   () => ValidateSlug(slug),
                                                   () => ValidateDescription(description)
                                                 );
-        return new Brand(id, name, description, companyName, slug, logoUrl, DateTime.UtcNow, isActive: true);
+        if (validationResult.Failed)
+            return validationResult.Errors;
+
+        return new Brand(id, name.Trim(), description?.Trim(), companyName.Trim(), slug.Trim(), logoUrl?.Trim(), DateTime.UtcNow, isActive: true);
     }
 
     public string Name { get; private set; }
@@ -49,9 +52,9 @@ public sealed class Brand : AggregateRoot<BrandId>, IHasCreationTime
     }
 
     private static Result<Success> ValidateName(string name) =>
-        !string.IsNullOrWhiteSpace(name) ? Result.Success : DomainErrors.Brands.NameInvalid;
+        !string.IsNullOrWhiteSpace(name) && name.Length <= BrandRules.MaxNameLength ? Result.Success : DomainErrors.Brands.NameInvalid;
     private static Result<Success> ValidateDescription(string? description) =>
-     description == null || !string.IsNullOrWhiteSpace(description) ? Result.Success : DomainErrors.Brands.DescriptionInvalid;
+     description == null || (!string.IsNullOrWhiteSpace(description) && description.Length <= BrandRules.MaxDescriptionLength) ?  Result.Success : DomainErrors.Brands.DescriptionInvalid;
     private static Result<Success> ValidateCompanyName(string companyName)
         => !string.IsNullOrWhiteSpace(companyName) ? Result.Success : DomainErrors.Brands.CompanyNameInvalid;
     private static Result<Success> ValidateSlug(string skuName)

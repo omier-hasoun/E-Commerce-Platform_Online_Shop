@@ -1,6 +1,7 @@
 
 using Application.Features.Public.Products.Queries.GetProductById;
 using Application.Features.Public.Products.Queries.ListProducts;
+using Application.Features.Public.Products.Queries.SearchProductSuggestions;
 using MediatR;
 
 namespace Api.Controllers.Products;
@@ -28,5 +29,13 @@ public sealed class ProductsController(IMediator mediator) : ApiController
         return result.Match((response) => Ok(response), Problem);
     }
 
+    [HttpGet("api/products/search")]
+    public async Task<IActionResult> GetSearchSuggestions([FromQuery] string searchTerm, CancellationToken ct)
+    {
+
+        var result = await mediator.Send(new SearchProductSuggestionsQuery(searchTerm), ct);
+
+        return result.Match((response) => Ok(response), Problem);
+    }
 
 }

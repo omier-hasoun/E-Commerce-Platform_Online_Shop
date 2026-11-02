@@ -129,16 +129,14 @@ export async function init()
 
 async function loadBrands(){
     const brandSelector = document.getElementById('brandSelector');
-    brandSelector.brands = await brandsClient.getBrands();
+    brandSelector.items = await brandsClient.getBrands();
 
-    console.log(brandSelector.getSelectedBrand());
 }
 
 async function loadCategories(){
     const categorySelector = document.getElementById('categorySelector');
 
-    categorySelector.categories = await categoryClient.getCategories();
-    console.log(categorySelector.getSelectedCategory());
+    categorySelector.items = await categoryClient.getCategories();
 }
 
 async function loadProducts() {
@@ -192,21 +190,19 @@ function renderProducts(products)
         if (product.hasDiscount) {
             card.setAttribute('hasDiscount', 'true');
         }
-        card.setAttribute('id', product.id);
+        card.setAttribute('product-id', product.id);
         card.setAttribute('title', product.title);
         card.setAttribute('brand', product.brand);
         card.setAttribute('thumbnail', product.thumbnail);
 
         card.setAttribute('rating', product.rating);
         card.setAttribute('inStock', product.inStock);
-        card.setAttribute('originalPrice', product.originalPrice);
-        card.setAttribute('discountPrice', product.discountPrice);
+        card.setAttribute('original-price', product.originalPrice);
+        card.setAttribute('discount-price', product.discountPrice);
 
-        card.setAttribute('discountPercentage', product.discountPercentage);
+        card.setAttribute('discount-percent', product.discountPercent);
         card.setAttribute('loading', loading);
-        productsContainer.appendChild(card);
-        card.render();
-
+        productsContainer.append(card);
     });
 
 
